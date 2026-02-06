@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- ==========================================================================
+       META TAGS
+       ========================================================================== 
+       These tags provide important information to browsers and search engines.
+       Always include these for proper rendering and SEO.
+  -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <!-- SEO Meta Tags - Update these with your information -->
+  <meta name="description" content="Interactive portfolio of [Your Name] - Frontend Developer. Explore my work in a unique garden experience." />
+  <meta name="keywords" content="portfolio, frontend developer, web developer, interactive" />
+  <meta name="author" content="Your Name" />
+  
+  <!-- Open Graph Tags - For social media sharing -->
+  <meta property="og:title" content="Your Name | Interactive Portfolio" />
+  <meta property="og:description" content="Explore my portfolio in a unique interactive experience" />
+  <meta property="og:type" content="website" />
+  
+  <!-- Favicon - Add your own favicon to public folder -->
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  
+  <!-- Page Title - Shows in browser tab -->
+  <title>Your Name | Interactive Portfolio</title>
+</head>
+
+<body>
+  <!-- ==========================================================================
+       LOADING SCREEN
+       ========================================================================== 
+       Shows while the page assets are loading.
+       This ensures users don't see a broken layout while things load.
+  -->
+  <div id="loading-screen" class="loading-screen">
+    <div class="loading-content">
+      <div class="loading-spinner"></div>
+      <p class="loading-text">Loading experience...</p>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       WELCOME MODAL
+       ========================================================================== 
+       First thing users see after loading.
+       Gives them the choice between interactive or quick view mode.
+       Also explains the keyboard controls for the car.
+  -->
+  <div id="welcome-modal" class="modal" aria-hidden="true">
+    <div class="modal-content">
+      <h1>Welcome to My Portfolio</h1>
+      <p class="modal-subtitle">Choose how you'd like to explore:</p>
+      
+      <!-- Mode Selection Buttons -->
+      <div class="mode-buttons">
+        <!-- Interactive Mode - The fun garden experience -->
+        <button id="btn-explore" class="btn btn-primary">
+          <span class="btn-icon">🚗</span>
+          <span class="btn-text">
+            <strong>Explore the Garden</strong>
+            <small>Use keyboard to drive around</small>
+          </span>
+        </button>
+        
+        <!-- Quick View Mode - Traditional portfolio -->
+        <button id="btn-quick" class="btn btn-secondary">
+          <span class="btn-icon">📄</span>
+          <span class="btn-text">
+            <strong>Quick View</strong>
+            <small>Traditional portfolio layout</small>
+          </span>
+        </button>
+      </div>
+      
+      <!-- Keyboard Instructions - Only shown for interactive mode -->
+      <div class="controls-hint">
+        <p>🎮 Controls:</p>
+        <div class="keyboard-keys">
+          <kbd>↑</kbd> <kbd>↓</kbd> <kbd>←</kbd> <kbd>→</kbd>
+          <span>or</span>
+          <kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       QUICK VIEW MODE
+       ========================================================================== 
+       A clean, professional view of your portfolio.
+       Hidden by default, shown when user clicks "Quick View".
+  -->
+  <div id="quick-view" class="quick-view" aria-hidden="true">
+    <header class="quick-header">
+      <h1>Your Name</h1>
+      <p>Frontend Developer | Creative Coder</p>
+      <nav class="quick-nav">
+        <a href="#about">About</a>
+        <a href="#skills">Skills</a>
+        <a href="#projects">Projects</a>
+        <a href="#contact">Contact</a>
+      </nav>
+    </header>
+    
+    <!-- Quick view sections - Customize with your content -->
+    <main class="quick-main">
+      <section id="about" class="quick-section">
+        <h2>About Me</h2>
+        <p>Your introduction goes here...</p>
+      </section>
+      
+      <section id="skills" class="quick-section">
+        <h2>Skills</h2>
+        <p>Your skills go here...</p>
+      </section>
+      
+      <section id="projects" class="quick-section">
+        <h2>Projects</h2>
+        <p>Your projects go here...</p>
+      </section>
+      
+      <section id="contact" class="quick-section">
+        <h2>Contact</h2>
+        <p>Your contact info goes here...</p>
+      </section>
+    </main>
+    
+    <!-- Button to switch to interactive mode -->
+    <button id="btn-switch-to-explore" class="btn-float">
+      🚗 Try Interactive Mode
+    </button>
+  </div>
+
+  <!-- ==========================================================================
+       INTERACTIVE GARDEN MODE
+       ========================================================================== 
+       The main interactive experience.
+       Contains the garden world, car, and information spots.
+  -->
+  <div id="garden-world" class="garden-world" aria-hidden="true">
+    
+    <!-- ========================================
+         GARDEN CONTAINER
+         ========================================
+         This is the scrollable/pannable garden area.
+         The car moves within this container.
+    -->
+    <div id="garden-container" class="garden-container">
+      
+      <!-- Sky Background Layer -->
+      <div class="sky-layer"></div>
+      
+      <!-- Garden Ground Layer -->
+      <div class="ground-layer">
+        
+        <!-- THE CAR - User controlled vehicle -->
+        <div id="car" class="car">
+          <div class="car-body"></div>
+          <div class="car-roof"></div>
+          <div class="car-wheel car-wheel-front"></div>
+          <div class="car-wheel car-wheel-back"></div>
+        </div>
+        
+        <!-- ========================================
+             INFORMATION SPOTS
+             ========================================
+             These are the locations in the garden where
+             users can find information about you.
+             Each spot triggers a popup when the car approaches.
+        -->
+        
+        <!-- About Me Spot -->
+        <div class="info-spot" id="spot-about" data-info="about">
+          <div class="spot-marker">
+            <span class="spot-icon">👤</span>
+            <span class="spot-label">About Me</span>
+          </div>
+          <div class="spot-area"></div>
+        </div>
+        
+        <!-- Skills Spot -->
+        <div class="info-spot" id="spot-skills" data-info="skills">
+          <div class="spot-marker">
+            <span class="spot-icon">⚡</span>
+            <span class="spot-label">Skills</span>
+          </div>
+          <div class="spot-area"></div>
+        </div>
+        
+        <!-- Projects Spot -->
+        <div class="info-spot" id="spot-projects" data-info="projects">
+          <div class="spot-marker">
+            <span class="spot-icon">💼</span>
+            <span class="spot-label">Projects</span>
+          </div>
+          <div class="spot-area"></div>
+        </div>
+        
+        <!-- Contact Spot -->
+        <div class="info-spot" id="spot-contact" data-info="contact">
+          <div class="spot-marker">
+            <span class="spot-icon">📧</span>
+            <span class="spot-label">Contact</span>
+          </div>
+          <div class="spot-area"></div>
+        </div>
+        
+        <!-- ========================================
+             ROAD DIRECTION SIGNS
+             ========================================
+             Signs along the road showing users where
+             to find each section. Like highway signs!
+        -->
+        
+        <!-- Starting Sign Post - Shows all directions -->
+        <div class="road-sign-post" id="sign-start">
+          <div class="sign-pole"></div>
+          <div class="sign-board sign-welcome">
+            <span class="sign-text">🚗 Welcome! Drive to explore</span>
+          </div>
+          <div class="sign-directions">
+            <div class="sign-arrow sign-arrow-up">
+              <span>👤 About Me</span>
+              <span class="arrow">↑</span>
+            </div>
+            <div class="sign-arrow sign-arrow-right">
+              <span>⚡ Skills</span>
+              <span class="arrow">→</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Middle Sign Post -->
+        <div class="road-sign-post" id="sign-middle">
+          <div class="sign-pole"></div>
+          <div class="sign-directions">
+            <div class="sign-arrow sign-arrow-up">
+              <span>💼 Projects</span>
+              <span class="arrow">↑</span>
+            </div>
+            <div class="sign-arrow sign-arrow-right">
+              <span>📧 Contact</span>
+              <span class="arrow">→</span>
+            </div>
+            <div class="sign-arrow sign-arrow-left">
+              <span>← Back</span>
+              <span class="arrow"></span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- End of Road Sign - Goodbye! -->
+        <div class="road-sign-post" id="sign-goodbye">
+          <div class="sign-pole"></div>
+          <div class="sign-board sign-goodbye">
+            <span class="sign-emoji">👋😊</span>
+            <span class="sign-text">Thanks for visiting!</span>
+            <span class="sign-subtext">Good Bye & Good Luck!</span>
+          </div>
+        </div>
+        
+        <!-- ========================================
+             DECORATIVE ELEMENTS
+             ========================================
+             Trees, flowers, and other garden decorations.
+             These are purely visual elements.
+        -->
+        <div class="decorations">
+          <!-- Trees will be dynamically generated via JS -->
+        </div>
+        
+        <!-- Road/Path the car drives on -->
+        <div class="road-path"></div>
+        
+      </div><!-- End Ground Layer -->
+    </div><!-- End Garden Container -->
+    
+    <!-- ========================================
+         HUD (Heads Up Display)
+         ========================================
+         Floating UI elements over the garden.
+    -->
+    
+    <!-- Mini Map - Shows car position in garden -->
+    <div id="mini-map" class="mini-map">
+      <div class="mini-map-car"></div>
+      <div class="mini-map-spots"></div>
+    </div>
+    
+    <!-- Controls Reminder -->
+    <div id="controls-reminder" class="controls-reminder">
+      <kbd>↑</kbd><kbd>↓</kbd><kbd>←</kbd><kbd>→</kbd> to move
+    </div>
+    
+    <!-- Quick View Toggle Button -->
+    <button id="btn-switch-to-quick" class="btn-float btn-float-top">
+      📄 Quick View
+    </button>
+    
+  </div><!-- End Garden World -->
+
+  <!-- ==========================================================================
+       INFO POPUP
+       ========================================================================== 
+       Modal that appears when the car reaches an information spot.
+       Content is dynamically loaded based on which spot was reached.
+  -->
+  <div id="info-popup" class="info-popup" aria-hidden="true">
+    <div class="info-popup-content">
+      <button id="info-popup-close" class="info-popup-close" aria-label="Close">×</button>
+      <h2 id="info-popup-title"></h2>
+      <div id="info-popup-body"></div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       MAIN JAVASCRIPT
+       ========================================================================== 
+       Vite will process this and bundle all our modules.
+       type="module" enables ES6 imports/exports.
+  -->
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

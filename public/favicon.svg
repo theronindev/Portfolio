@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- Simple car favicon for the portfolio -->
+  
+  <!-- Ground -->
+  <rect x="0" y="70" width="100" height="30" fill="#7ec850"/>
+  
+  <!-- Car body -->
+  <rect x="20" y="45" width="60" height="20" rx="4" fill="#ff4444"/>
+  
+  <!-- Car roof -->
+  <rect x="35" y="30" width="35" height="18" rx="3" fill="#ff6666"/>
+  
+  <!-- Windows -->
+  <rect x="40" y="34" width="10" height="10" rx="1" fill="#87CEEB" opacity="0.8"/>
+  <rect x="55" y="34" width="10" height="10" rx="1" fill="#87CEEB" opacity="0.8"/>
+  
+  <!-- Wheels -->
+  <circle cx="35" cy="65" r="10" fill="#333"/>
+  <circle cx="35" cy="65" r="6" fill="#666"/>
+  <circle cx="65" cy="65" r="10" fill="#333"/>
+  <circle cx="65" cy="65" r="6" fill="#666"/>
+</svg>

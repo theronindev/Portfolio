@@ -1,0 +1,1185 @@
+/**
+ * =============================================================================
+ * MAIN.SCSS - Main Stylesheet
+ * =============================================================================
+ * 
+ * This is the main stylesheet that imports all other styles.
+ * Organized using a modular approach for maintainability.
+ * 
+ * TABLE OF CONTENTS:
+ * 1. Imports & Variables
+ * 2. Reset & Base Styles
+ * 3. Loading Screen
+ * 4. Welcome Modal
+ * 5. Quick View Mode
+ * 6. Garden World
+ * 7. The Car
+ * 8. Info Spots
+ * 9. Info Popup
+ * 10. HUD Elements
+ * 11. Buttons
+ * 12. Utilities & Animations
+ * 
+ * =============================================================================
+ */
+
+// =============================================================================
+// 1. IMPORTS & VARIABLES
+// =============================================================================
+
+@import 'variables';
+
+
+// =============================================================================
+// 2. RESET & BASE STYLES
+// =============================================================================
+
+/**
+ * CSS Reset
+ * Removes default browser styling for consistent cross-browser appearance
+ */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  // Smooth scrolling for anchor links
+  scroll-behavior: smooth;
+  
+  // Base font size (1rem = 16px)
+  font-size: 16px;
+}
+
+body {
+  font-family: $font-family-base;
+  font-size: $font-size-base;
+  line-height: $line-height-base;
+  color: $color-text;
+  background-color: $color-background;
+  
+  // Prevent text selection during car movement
+  user-select: none;
+  
+  // Hide scrollbars when in garden mode
+  overflow: hidden;
+  
+  // Minimum height
+  min-height: 100vh;
+}
+
+// Remove outline on click, keep for keyboard navigation
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+:focus-visible {
+  outline: 2px solid $color-primary;
+  outline-offset: 2px;
+}
+
+
+// =============================================================================
+// 3. LOADING SCREEN
+// =============================================================================
+
+/**
+ * Full-screen loading overlay
+ * Shows while assets are loading
+ */
+.loading-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, $color-primary-dark, $color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: $z-index-loading;
+}
+
+.loading-content {
+  text-align: center;
+  color: white;
+}
+
+/**
+ * Animated loading spinner
+ * Pure CSS, no images needed
+ */
+.loading-spinner {
+  width: 60px;
+  height: 60px;
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  margin: 0 auto $spacing-4;
+  animation: spin 1s linear infinite;
+}
+
+.loading-text {
+  font-size: $font-size-lg;
+  opacity: 0.9;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+
+// =============================================================================
+// 4. WELCOME MODAL
+// =============================================================================
+
+/**
+ * Welcome modal overlay
+ * Presents mode choice to the user
+ */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: $color-overlay-dark;
+  display: none; // Hidden by default
+  align-items: center;
+  justify-content: center;
+  z-index: $z-index-modal;
+  padding: $spacing-4;
+}
+
+.modal-content {
+  background: $color-surface;
+  padding: $spacing-8;
+  border-radius: $radius-xl;
+  max-width: 500px;
+  width: 100%;
+  text-align: center;
+  box-shadow: $shadow-popup;
+  
+  h1 {
+    font-size: $font-size-3xl;
+    color: $color-primary-dark;
+    margin-bottom: $spacing-2;
+  }
+}
+
+.modal-subtitle {
+  color: $color-text-light;
+  margin-bottom: $spacing-6;
+}
+
+/**
+ * Mode selection buttons container
+ */
+.mode-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-4;
+  margin-bottom: $spacing-6;
+}
+
+/**
+ * Keyboard controls hint
+ */
+.controls-hint {
+  padding: $spacing-4;
+  background: rgba($color-primary, 0.1);
+  border-radius: $radius-md;
+  
+  p {
+    font-weight: $font-weight-semibold;
+    margin-bottom: $spacing-2;
+  }
+}
+
+.keyboard-keys {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-2;
+  flex-wrap: wrap;
+  
+  span {
+    color: $color-text-muted;
+    font-size: $font-size-sm;
+  }
+}
+
+/**
+ * Keyboard key styling
+ */
+kbd {
+  display: inline-block;
+  padding: $spacing-1 $spacing-2;
+  font-family: $font-family-mono;
+  font-size: $font-size-sm;
+  background: $color-surface;
+  border: 1px solid #ddd;
+  border-radius: $radius-sm;
+  box-shadow: 0 2px 0 #ccc;
+}
+
+
+// =============================================================================
+// 5. QUICK VIEW MODE
+// =============================================================================
+
+/**
+ * Professional/traditional portfolio view
+ * Clean layout for recruiters who want quick access
+ */
+.quick-view {
+  display: none; // Hidden by default
+  min-height: 100vh;
+  overflow-y: auto;
+}
+
+.quick-header {
+  background: linear-gradient(135deg, $color-primary-dark, $color-primary);
+  color: white;
+  padding: $spacing-16 $spacing-4;
+  text-align: center;
+  
+  h1 {
+    font-size: $font-size-4xl;
+    margin-bottom: $spacing-2;
+  }
+  
+  p {
+    font-size: $font-size-lg;
+    opacity: 0.9;
+    margin-bottom: $spacing-6;
+  }
+}
+
+.quick-nav {
+  display: flex;
+  gap: $spacing-4;
+  justify-content: center;
+  flex-wrap: wrap;
+  
+  a {
+    color: white;
+    text-decoration: none;
+    padding: $spacing-2 $spacing-4;
+    border-radius: $radius-full;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    transition: all $duration-normal $ease-smooth;
+    
+    &:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+  }
+}
+
+.quick-main {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: $spacing-8 $spacing-4;
+}
+
+.quick-section {
+  margin-bottom: $spacing-12;
+  
+  h2 {
+    font-size: $font-size-2xl;
+    color: $color-primary-dark;
+    margin-bottom: $spacing-4;
+    padding-bottom: $spacing-2;
+    border-bottom: 2px solid $color-primary-light;
+  }
+}
+
+
+// =============================================================================
+// 6. GARDEN WORLD
+// =============================================================================
+
+/**
+ * Main container for the interactive garden experience
+ */
+.garden-world {
+  display: none; // Hidden by default
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+/**
+ * Scrollable/pannable garden area
+ * Larger than viewport, camera follows the car
+ */
+.garden-container {
+  position: absolute;
+  width: $garden-width;
+  height: $garden-height;
+  
+  // Will be transformed to follow the car
+  transform-origin: center center;
+  transition: transform 0.1s linear;
+}
+
+/**
+ * Sky background layer
+ * Garden layout: Sky at top, grass everywhere, road in middle
+ */
+.sky-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  // Sky blue gradient at top, then grass green for the garden
+  background: linear-gradient(
+    to bottom,
+    $color-sky-gradient-top 0%,
+    $color-sky-gradient-bottom 25%,
+    $color-grass 25%,
+    $color-grass-dark 100%
+  );
+  z-index: $z-index-ground;
+}
+
+/**
+ * Ground layer - contains all interactive elements
+ */
+.ground-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: $z-index-ground + 1;
+}
+
+/**
+ * Road/path styling
+ * Road is positioned in the middle of the garden (Y: 950-1050)
+ * Car starts here in the middle of the street
+ */
+.road-path {
+  position: absolute;
+  // Road positioned at middle of garden (2000px height)
+  top: 950px;
+  left: 0;
+  width: 100%;
+  height: 100px;
+  background: linear-gradient(to bottom, 
+    #444 0%, 
+    #555 10%, 
+    #555 90%, 
+    #444 100%
+  );
+  z-index: $z-index-road;
+  
+  // Road edges (curbs)
+  &::before {
+    content: '';
+    position: absolute;
+    top: -5px;
+    left: 0;
+    width: 100%;
+    height: 5px;
+    background: #888;
+  }
+  
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 100%;
+    height: 5px;
+    background: #888;
+  }
+}
+
+// Road center line (dashed)
+.road-path::before {
+  content: '';
+  position: absolute;
+  top: 48px;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: repeating-linear-gradient(
+    to right,
+    #ffd700 0px,
+    #ffd700 40px,
+    transparent 40px,
+    transparent 80px
+  );
+}
+
+
+// =============================================================================
+// 7. THE CAR
+// =============================================================================
+
+/**
+ * Car container - positioned via JavaScript (GSAP)
+ * FIXED: Added transform-origin to rotate around center
+ */
+.car {
+  position: absolute;
+  width: $car-width;
+  height: $car-height;
+  z-index: $z-index-car;
+  
+  // IMPORTANT: Rotate around the center of the car
+  transform-origin: center center;
+  
+  // Let GSAP handle all transforms - don't add CSS transitions
+  // that might conflict with GSAP animations
+}
+
+/**
+ * Car body - main rectangle
+ */
+.car-body {
+  position: absolute;
+  bottom: 10px;
+  left: 5px;
+  width: 70px;
+  height: 20px;
+  background: linear-gradient(to bottom, #ff4444, #cc0000);
+  border-radius: $radius-sm;
+  box-shadow: $shadow-car;
+}
+
+/**
+ * Car roof/cabin
+ */
+.car-roof {
+  position: absolute;
+  bottom: 25px;
+  left: 15px;
+  width: 40px;
+  height: 15px;
+  background: linear-gradient(to bottom, #ff6666, #ff4444);
+  border-radius: $radius-sm $radius-sm 0 0;
+  
+  // Windows
+  &::before {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 5px;
+    width: 12px;
+    height: 10px;
+    background: rgba(135, 206, 235, 0.7);
+    border-radius: 2px;
+  }
+  
+  &::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    right: 5px;
+    width: 12px;
+    height: 10px;
+    background: rgba(135, 206, 235, 0.7);
+    border-radius: 2px;
+  }
+}
+
+/**
+ * Car wheels
+ */
+.car-wheel {
+  position: absolute;
+  bottom: 2px;
+  width: 16px;
+  height: 16px;
+  background: #333;
+  border-radius: 50%;
+  border: 3px solid #666;
+  
+  // Wheel animation when moving
+  &.spinning {
+    animation: wheelSpin 0.3s linear infinite;
+  }
+}
+
+.car-wheel-front {
+  left: 55px;
+}
+
+.car-wheel-back {
+  left: 10px;
+}
+
+@keyframes wheelSpin {
+  to { transform: rotate(360deg); }
+}
+
+
+// =============================================================================
+// 8. INFO SPOTS
+// =============================================================================
+
+/**
+ * Information spots in the garden
+ * These are the locations users can drive to
+ */
+.info-spot {
+  position: absolute;
+  z-index: $z-index-info-spots;
+}
+
+/**
+ * Visible marker for the spot
+ */
+.spot-marker {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  animation: float 3s ease-in-out infinite;
+}
+
+.spot-icon {
+  font-size: 2.5rem;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+.spot-label {
+  margin-top: $spacing-1;
+  padding: $spacing-1 $spacing-2;
+  background: $color-surface;
+  border-radius: $radius-full;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  box-shadow: $shadow-md;
+  white-space: nowrap;
+}
+
+/**
+ * Invisible trigger area around the spot
+ */
+.spot-area {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: $info-spot-size;
+  height: $info-spot-size;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  
+  // Debug: uncomment to see trigger areas
+  // background: rgba(255, 0, 0, 0.2);
+  // border: 2px dashed red;
+}
+
+// Floating animation for markers
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+// =============================================================================
+// 8.2 DECORATIVE ELEMENTS (Trees, Bushes, Flowers)
+// =============================================================================
+
+/**
+ * Tree styling - Generated dynamically in garden.js
+ */
+.tree {
+  position: absolute;
+  pointer-events: none;
+}
+
+.tree-trunk {
+  width: 20px;
+  height: 40px;
+  background: linear-gradient(to right, #5D4037, #8D6E63, #5D4037);
+  border-radius: 3px;
+  margin: 0 auto;
+}
+
+.tree-leaves {
+  width: 60px;
+  height: 60px;
+  background: radial-gradient(ellipse at center, #4CAF50 0%, #2E7D32 70%, #1B5E20 100%);
+  border-radius: 50%;
+  margin-top: -20px;
+  margin-left: -20px;
+  box-shadow: 
+    inset -5px -5px 15px rgba(0,0,0,0.2),
+    3px 3px 10px rgba(0,0,0,0.3);
+}
+
+/**
+ * Bush styling
+ */
+.bush {
+  pointer-events: none;
+}
+
+/**
+ * Flower styling
+ */
+.flower {
+  pointer-events: none;
+  animation: sway 3s ease-in-out infinite;
+}
+
+@keyframes sway {
+  0%, 100% { transform: rotate(-5deg); }
+  50% { transform: rotate(5deg); }
+}
+
+// -----------------------------------------------------------------------------
+// Info Spot Positions
+// Customize these to place spots in your garden
+// Road is at Y: 950-1050 (middle of 2000px height)
+// -----------------------------------------------------------------------------
+
+#spot-about {
+  top: 400px;      // Above the road
+  left: 500px;
+}
+
+#spot-skills {
+  top: 600px;      // Above the road
+  left: 1200px;
+}
+
+#spot-projects {
+  top: 400px;      // Above the road  
+  left: 1900px;
+}
+
+#spot-contact {
+  top: 600px;      // Above the road
+  left: 2500px;
+}
+
+
+// =============================================================================
+// 8.5 ROAD DIRECTION SIGNS
+// =============================================================================
+
+/**
+ * Road sign posts - Highway-style direction signs
+ * Help users navigate to different sections
+ */
+.road-sign-post {
+  position: absolute;
+  z-index: $z-index-info-spots + 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/**
+ * Sign pole - The vertical post
+ */
+.sign-pole {
+  width: 8px;
+  height: 120px;
+  background: linear-gradient(to right, #666, #888, #666);
+  border-radius: 4px;
+  box-shadow: 2px 0 4px rgba(0, 0, 0, 0.3);
+}
+
+/**
+ * Sign board - The main sign panel
+ */
+.sign-board {
+  position: absolute;
+  bottom: 100px;
+  padding: $spacing-3 $spacing-4;
+  border-radius: $radius-md;
+  text-align: center;
+  box-shadow: $shadow-lg;
+  white-space: nowrap;
+}
+
+.sign-welcome {
+  background: linear-gradient(135deg, #2e7d32, #1b5e20);
+  color: white;
+  border: 3px solid #fff;
+  
+  .sign-text {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-bold;
+  }
+}
+
+.sign-goodbye {
+  background: linear-gradient(135deg, #1565c0, #0d47a1);
+  color: white;
+  border: 3px solid #ffd700;
+  padding: $spacing-4 $spacing-6;
+  
+  .sign-emoji {
+    display: block;
+    font-size: 2.5rem;
+    margin-bottom: $spacing-2;
+    animation: wave 1s ease-in-out infinite;
+  }
+  
+  .sign-text {
+    display: block;
+    font-size: $font-size-xl;
+    font-weight: $font-weight-bold;
+    margin-bottom: $spacing-1;
+  }
+  
+  .sign-subtext {
+    display: block;
+    font-size: $font-size-base;
+    opacity: 0.9;
+  }
+}
+
+// Wave animation for goodbye emoji
+@keyframes wave {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(20deg); }
+  75% { transform: rotate(-20deg); }
+}
+
+/**
+ * Direction arrows container
+ */
+.sign-directions {
+  position: absolute;
+  bottom: 80px;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-2;
+}
+
+/**
+ * Individual direction arrow signs
+ */
+.sign-arrow {
+  display: flex;
+  align-items: center;
+  gap: $spacing-2;
+  padding: $spacing-2 $spacing-3;
+  background: #2e7d32;
+  color: white;
+  border-radius: $radius-sm;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  box-shadow: $shadow-md;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  white-space: nowrap;
+  
+  .arrow {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-bold;
+  }
+}
+
+.sign-arrow-right {
+  background: linear-gradient(90deg, #2e7d32, #1b5e20);
+  border-radius: $radius-sm 20px 20px $radius-sm;
+  padding-right: $spacing-4;
+  
+  // Arrow shape on right side
+  &::after {
+    content: '';
+    position: absolute;
+    right: -15px;
+    top: 50%;
+    transform: translateY(-50%);
+    border-left: 15px solid #1b5e20;
+    border-top: 18px solid transparent;
+    border-bottom: 18px solid transparent;
+  }
+}
+
+.sign-arrow-left {
+  background: linear-gradient(270deg, #2e7d32, #1b5e20);
+  border-radius: 20px $radius-sm $radius-sm 20px;
+  padding-left: $spacing-4;
+  flex-direction: row-reverse;
+  
+  // Arrow shape on left side
+  &::before {
+    content: '';
+    position: absolute;
+    left: -15px;
+    top: 50%;
+    transform: translateY(-50%);
+    border-right: 15px solid #1b5e20;
+    border-top: 18px solid transparent;
+    border-bottom: 18px solid transparent;
+  }
+}
+
+.sign-arrow-up {
+  background: linear-gradient(0deg, #1565c0, #0d47a1);
+  flex-direction: column;
+  text-align: center;
+  padding: $spacing-2 $spacing-4;
+  
+  .arrow {
+    font-size: $font-size-xl;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Road Sign Positions
+// -----------------------------------------------------------------------------
+
+#sign-start {
+  top: 850px;       // Just above the road
+  left: 150px;      // Near the start
+}
+
+#sign-middle {
+  top: 850px;
+  left: 1400px;     // Middle of the garden
+}
+
+#sign-goodbye {
+  top: 820px;
+  left: 2850px;     // End of the road
+}
+
+
+// =============================================================================
+// 9. INFO POPUP
+// =============================================================================
+
+/**
+ * Popup modal for displaying info spot content
+ */
+.info-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: $color-overlay-dark;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: $z-index-modal;
+  padding: $spacing-4;
+}
+
+.info-popup-content {
+  background: $color-surface;
+  padding: $spacing-8;
+  border-radius: $radius-xl;
+  max-width: 600px;
+  width: 100%;
+  max-height: 80vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: $shadow-popup;
+  
+  h2 {
+    font-size: $font-size-2xl;
+    color: $color-primary-dark;
+    margin-bottom: $spacing-4;
+  }
+  
+  p {
+    margin-bottom: $spacing-3;
+    line-height: $line-height-relaxed;
+  }
+  
+  ul {
+    margin-left: $spacing-4;
+    margin-bottom: $spacing-4;
+    
+    li {
+      margin-bottom: $spacing-2;
+    }
+  }
+  
+  a {
+    color: $color-primary;
+    text-decoration: none;
+    
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+.info-popup-close {
+  position: absolute;
+  top: $spacing-4;
+  right: $spacing-4;
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: transparent;
+  font-size: $font-size-2xl;
+  cursor: pointer;
+  color: $color-text-muted;
+  border-radius: 50%;
+  transition: all $duration-fast $ease-smooth;
+  
+  &:hover {
+    background: rgba(0, 0, 0, 0.1);
+    color: $color-text;
+  }
+}
+
+/**
+ * Project list styling inside popup
+ */
+.project-list {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-4;
+}
+
+.project-item {
+  padding: $spacing-4;
+  background: rgba($color-primary, 0.05);
+  border-radius: $radius-md;
+  border-left: 4px solid $color-primary;
+  
+  h3 {
+    font-size: $font-size-lg;
+    margin-bottom: $spacing-2;
+  }
+  
+  p {
+    margin-bottom: $spacing-2;
+    color: $color-text-light;
+  }
+}
+
+.contact-links {
+  list-style: none;
+  margin-left: 0;
+  
+  li {
+    padding: $spacing-2 0;
+  }
+}
+
+
+// =============================================================================
+// 10. HUD ELEMENTS
+// =============================================================================
+
+/**
+ * Mini-map showing car position in garden
+ */
+.mini-map {
+  position: fixed;
+  bottom: $spacing-4;
+  right: $spacing-4;
+  width: 150px;
+  height: 100px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 2px solid $color-primary;
+  border-radius: $radius-md;
+  z-index: $z-index-hud;
+  overflow: hidden;
+  box-shadow: $shadow-lg;
+}
+
+.mini-map-car {
+  position: absolute;
+  width: 8px;
+  height: 4px;
+  background: red;
+  border-radius: 2px;
+  // Position updated via JS
+}
+
+/**
+ * Controls reminder overlay
+ */
+.controls-reminder {
+  position: fixed;
+  bottom: $spacing-4;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: $spacing-2 $spacing-4;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  border-radius: $radius-full;
+  font-size: $font-size-sm;
+  z-index: $z-index-hud;
+  
+  kbd {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+    box-shadow: none;
+    color: white;
+  }
+}
+
+
+// =============================================================================
+// 11. BUTTONS
+// =============================================================================
+
+/**
+ * Base button styles
+ */
+.btn {
+  display: flex;
+  align-items: center;
+  gap: $spacing-3;
+  padding: $spacing-4 $spacing-6;
+  border: none;
+  border-radius: $radius-lg;
+  font-size: $font-size-base;
+  font-weight: $font-weight-semibold;
+  cursor: pointer;
+  transition: all $duration-normal $ease-smooth;
+  text-align: left;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: $shadow-lg;
+  }
+  
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+.btn-icon {
+  font-size: 1.5rem;
+}
+
+.btn-text {
+  display: flex;
+  flex-direction: column;
+  
+  small {
+    font-weight: $font-weight-normal;
+    font-size: $font-size-sm;
+    opacity: 0.8;
+  }
+}
+
+/**
+ * Primary button - main action
+ */
+.btn-primary {
+  background: linear-gradient(135deg, $color-primary, $color-primary-dark);
+  color: white;
+  
+  &:hover {
+    background: linear-gradient(135deg, $color-primary-light, $color-primary);
+  }
+}
+
+/**
+ * Secondary button - alternative action
+ */
+.btn-secondary {
+  background: $color-surface;
+  color: $color-text;
+  border: 2px solid $color-primary;
+  
+  &:hover {
+    background: rgba($color-primary, 0.1);
+  }
+}
+
+/**
+ * Floating button - fixed position toggle
+ */
+.btn-float {
+  position: fixed;
+  bottom: $spacing-4;
+  left: $spacing-4;
+  padding: $spacing-3 $spacing-4;
+  background: $color-surface;
+  border: 2px solid $color-primary;
+  border-radius: $radius-full;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  cursor: pointer;
+  z-index: $z-index-hud;
+  box-shadow: $shadow-md;
+  transition: all $duration-normal $ease-smooth;
+  
+  &:hover {
+    background: $color-primary;
+    color: white;
+  }
+}
+
+.btn-float-top {
+  bottom: auto;
+  top: $spacing-4;
+}
+
+
+// =============================================================================
+// 12. UTILITIES & ANIMATIONS
+// =============================================================================
+
+/**
+ * Screen reader only content
+ */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/**
+ * Hide element visually but maintain accessibility
+ */
+[aria-hidden="true"] {
+  // Element is hidden from screen readers
+}
+
+/**
+ * Responsive visibility utilities
+ */
+@media (max-width: $breakpoint-md) {
+  // Hide mini-map on mobile (too small to be useful)
+  .mini-map {
+    display: none;
+  }
+  
+  // Adjust modal padding
+  .modal-content,
+  .info-popup-content {
+    padding: $spacing-4;
+  }
+  
+  // Smaller text on mobile
+  .modal-content h1 {
+    font-size: $font-size-2xl;
+  }
+}
+
+/**
+ * Reduced motion preference
+ * Respects user's system preference for reduced animations
+ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
