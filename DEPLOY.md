@@ -107,7 +107,7 @@ Open the live URL and check:
 - [ ] The stats bar counts up from zero
 - [ ] The moon/sun button toggles dark and light, and the choice survives a reload
 - [ ] **Interactive Mode** opens the side-scroller (this proves `interactive.html` built)
-- [ ] On a phone, the road is replaced by a stacked list of all 18 milestones
+- [ ] On a phone, the road is replaced by a stacked list of all 17 milestones
 
 ### Step 5. From now on, deploying is just pushing
 
@@ -186,7 +186,7 @@ Two constraints to know about:
 
 ```
 portfolio/
-├── index.html           ← the whole site: inline CSS + JS, 18-milestone roadmap
+├── index.html           ← the whole site: inline CSS + JS, 17-milestone roadmap
 ├── interactive.html     ← hidden side-scroller, iframed by index.html
 ├── vite.config.js       ← builds BOTH html files (see note below)
 ├── package.json
@@ -231,29 +231,53 @@ instead of a minute.
 
 ---
 
-## Known issue: the icons are far too large
+## Known issue: the images are far too large
 
 This is the one thing worth fixing before you show the site to anyone on a slow
-connection. The build is currently about **6.5 MB**, and nearly all of it is
-icon files that are displayed at 48 to 52 pixels:
+connection. The build is about **7.1 MB**, and nearly all of it is images shown
+at a fraction of their real size:
 
 | File | Size | Displayed at |
 |---|---|---|
-| `src/assets/icons/cosmetica.png` | 2.2 MB | 52 px |
-| `src/assets/images/roninicon.png` | 1.4 MB | 90 px (and the favicon) |
-| `src/assets/icons/sk.png` | 889 KB | 52 px |
-| `src/assets/icons/roninflow.png` | 854 KB | 52 px |
-| `src/assets/icons/alkasid.png` | 651 KB | 52 px |
+| `public/icons/cosmetica.png` | 2.2 MB | 52 px |
+| `src/assets/images/roninicon.png` | 1.4 MB | 90 px, and the favicon |
+| `public/icons/sk.png` | 889 KB | 52 px |
+| `public/icons/roninflow.png` | 855 KB | 52 px |
+| `src/assets/images/me.jpg` | 722 KB | 160 px |
+| `public/icons/alkasid.png` | 652 KB | 52 px |
 
-Resized to 128×128 these would be roughly 5 to 15 KB each, cutting the page
-weight by well over 90% with no visible difference. The originals are committed
-to git, so nothing is lost by re-encoding the copies the site actually loads.
+Resized to 128x128 the icons would be roughly 5 to 15 KB each, and the photo
+would be well under 100 KB at 320px. That cuts page weight by over 90% with no
+visible difference. Every original is committed to git, so re-encoding the
+served copies loses nothing.
 
-Note that `public/icons/` and `src/assets/icons/` hold the same images. Only
-`public/icons/` is served now, so resize that folder; keep `src/assets/icons/`
-as your archive of originals.
+Both `public/icons/` and `src/assets/icons/` hold the same images. `public/icons/`
+is what gets served; `src/assets/icons/` is the archive *and* the fallback used
+when you open the file off disk, so **resize both to keep them identical.**
 
 ---
+
+## Why icons vanish when you double-click index.html
+
+Opening `index.html` directly from the folder is not the same as serving it.
+Icons live in `public/icons/` and are served at `/icons/*`, but `public/` is not
+part of the served path, so there is no `icons/` folder at the project root for
+the browser to find. Over http the path is correct, which is why the dev server,
+`npm run preview`, and the live Cloudflare site are all fine.
+
+The site now retries against `src/assets/icons/`, which is a real folder on
+disk, so opening the file directly works too.
+
+That said, **use the dev server.** Opening the file off disk also skips Vite
+entirely, so you are not looking at what actually deploys:
+
+```bash
+npm run dev       # http://localhost:3000, hot reload
+npm run preview   # serves dist/ exactly as Cloudflare will
+```
+
+---
+
 
 ## Troubleshooting
 
@@ -266,6 +290,9 @@ It must be `dist`, not `/dist` or `./dist`.
 **Interactive Mode shows a blank overlay or a 404.** `dist/interactive.html` is
 missing, which means `vite.config.js` lost its second rollup input. Run
 `npm run build` locally and confirm the file exists.
+
+**Icons missing when you open index.html from the folder.** Expected; see the
+section above. Run `npm run dev` instead.
 
 **Icons missing on the live site but fine locally.** Filenames are
 case-sensitive on Cloudflare and were not on your Windows machine. Check that

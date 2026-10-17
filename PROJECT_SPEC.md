@@ -3,7 +3,7 @@
 ## Overview
 Portfolio website for **Samer Jameel** (The Ronin Dev), a software engineer building
 cross-platform mobile apps in **Flutter** and **React Native**, plus full-stack web,
-desktop, and backend tools. Features a winding roadmap journey of 18 milestones
+desktop, and backend tools. Features a winding roadmap journey of 17 milestones
 covering career history and projects, plus a hidden ronin side-scroller mode.
 
 ## Domains
@@ -77,7 +77,7 @@ Native, because that is the evidence of delivery. The "Currently Building" card
 |--------|---------|------|
 | May 2024 - Present | Al-Mouyasser LLC | Software Engineer — Mobile & Full-Stack |
 
-## Milestones (18 total)
+## Milestones (17 total)
 
 Ordered as they appear along the road. `type` drives the node colour and the card
 accent: `career` is gold, `project` is crimson, `pivot` is the crimson-and-gold
@@ -92,30 +92,29 @@ Al-Mouyasser node.
 | 4 | Switch Communications — NOC | Feb 2020 | career | SIEM, TrendMicro |
 | 5 | Al-Kasid Enterprises | Jul 2023 | career | Cisco, Ubiquiti, Grandstream |
 | 6 | **Al-Mouyasser — Software Engineer** | May 2024 | pivot | Flutter, React Native, Next.js |
-| 7 | Ticket Management System | 2024 | project | React Native, Firebase, SQL Server |
-| 8 | IT Operations Checklist | 2024 | project | React Native, AsyncStorage |
-| 9 | SK Mobile — Warehouse Management | 2025 | project | React Native, Expo, PHP, Oracle |
-| 10 | IoW — Inventory on Wheels | 2025 | project | React Native, SheetJS, PDF export |
-| 11 | IT Asset Management System | 2025 | project | React Native, Node, Next.js, SQL Server |
-| 12 | Cosmeticca — Price Lookup | 2025 | project | React Native, PHP, SQL Server |
-| 13 | TanCafe — Score Calculator | Dec 2025 | project | React Native, Expo 54 · **both stores** |
-| 14 | Al-Mouyasser Hub — Desktop Automation | 2026 | project | Python, CustomTkinter, PyAutoGUI |
-| 15 | MSR — Sales Rep & Customer Lookup | 2026 | project | Go, SQL Server, systemd |
-| 16 | HR CV Screener — AI Resume Filtering | 2026 | project | Electron, Ollama/Llama 3.1, Tesseract |
-| 17 | **SFA Distribution — Field Sales App** | 2026 | project | **Flutter**, Dart, PHP, SQL Server |
+| 7 | IT Operations Checklist | 2024 | project | React Native, AsyncStorage |
+| 8 | SK Mobile — Warehouse Management | 2025 | project | React Native, Expo, PHP, Oracle |
+| 9 | IoW — Inventory on Wheels | 2025 | project | React Native, SheetJS, PDF export |
+| 10 | IT Asset Management System | 2025 | project | React Native, Node, Next.js, SQL Server |
+| 11 | Cosmeticca — Price Lookup | 2025 | project | React Native, PHP, SQL Server |
+| 12 | TanCafe — Score Calculator | Dec 2025 | project | React Native, Expo 54 · **both stores** |
+| 13 | Al-Mouyasser Hub — Desktop Automation | 2026 | project | Python, CustomTkinter, PyAutoGUI |
+| 14 | MSR — Sales Rep & Customer Lookup | 2026 | project | Go, SQL Server, systemd |
+| 15 | HR CV Screener — AI Resume Filtering | 2026 | project | Electron, Ollama/Llama 3.1, Tesseract |
+| 16 | **SFA Distribution — Field Sales App** | 2026 | project | **Flutter**, Dart, PHP, SQL Server |
 
 Published apps: **TanCafe** on both stores.
 - iOS: https://apps.apple.com/us/app/tan-cafe-points-calculator/id6759920761
 - Android: https://play.google.com/store/apps/details?id=com.tancafe.app
 
-> The four 2026 dates (milestones 14-17) are an ordering choice, not confirmed
+> The four 2026 dates (milestones 13-16) are an ordering choice, not confirmed
 > months. The resume does not date these projects. Correct them in the
 > `MILESTONES` array if the real dates differ.
 
 ## Project Structure
 ```
 portfolio/
-├── index.html            # Main site: 18-milestone roadmap, inline CSS+JS
+├── index.html            # Main site: 17-milestone roadmap, inline CSS+JS
 ├── interactive.html      # Hidden side-scroller (iframed by index.html)
 ├── vite.config.js        # Vite config — TWO entry points, port 3000, esbuild
 ├── package.json
@@ -144,8 +143,8 @@ Logo (circular, 90px) · 浪人の道 · "Samer Jameel" gradient text · "The Ro
 moon, mountain silhouettes, radial gradients
 
 ### Stats Bar (animated count-up)
-- 18+ Projects Shipped
-- Flutter & RN — Primary Stack
+- 12+ Projects Shipped
+- Flutter — Primary Stack
 - 2 Apps Live on Stores
 - 5+ Years Software Engineering
 
@@ -154,7 +153,7 @@ moon, mountain silhouettes, radial gradients
 
 ### About Me
 Circular photo (`me.jpg`, crimson border) and a bio covering the IT-to-software
-pivot, 18+ shipped apps, Flutter and React Native, and the backend and
+pivot, a dozen shipped applications, Flutter and React Native, and the backend and
 offline-first work.
 
 ### Currently Building
@@ -164,9 +163,9 @@ Firebase, go_router, Material 3**, with a shimmer bar and pulsing green dot.
 ### My Journey (Roadmap)
 - Winding SVG road, `viewBox="0 -80 1100 2480"`, five S-curves
 - Gold dashed center line with a crimson draw-on-scroll reveal (IntersectionObserver)
-- 18 milestone nodes, each with an icon image or an emoji fallback
+- 17 milestone nodes, each with an icon image or an emoji fallback
 - Hover cards in app-store style: 48px icon, title, subtitle, description, tags, store links
-- Below 768px the road is hidden entirely and all 18 milestones render as a
+- Below 768px the road is hidden entirely and all 17 milestones render as a
   stacked card list from the same data
 
 ### Battle Skills (10 cards)
@@ -232,27 +231,55 @@ zen garden) with slide-in info panels.
 `CARD_POS` and the SVG are checked against each other at a glance: every node's
 `data-idx` must have a `CARD_POS` row with the same `nodeY`.
 
+## Icon paths: why they break when you open the file directly
+
+Icons live in `public/icons/` and are served at `/icons/*`. That path is correct
+over http, which covers `npm run dev`, `npm run preview`, and Cloudflare Pages.
+It does **not** resolve when `index.html` is opened straight off disk, because
+`public/` is not part of the served path, so no `icons/` folder exists at the
+project root.
+
+The site now retries against `src/assets/icons/`, a real folder on disk, so
+opening the file directly works too. Card `<img>` tags carry an `onerror` retry.
+The SVG node `<image>` elements use a one-time reachability probe instead,
+because an error listener added by the inline script at the end of `<body>`
+would race against images that had already failed and fired.
+
+Verified by serving the project root over http, which mirrors the disk layout:
+
+| Path | Result |
+|---|---|
+| `icons/aljazeera.jpg` | 404, triggers the fallback |
+| `src/assets/icons/aljazeera.jpg` | 200, rescues it |
+
+Keep `src/assets/icons/` in sync with `public/icons/`. It is both the archive of
+originals and the off-disk fallback. The preferred workflow is still
+`npm run dev`.
+
 ## What's Done
 - [x] Flutter-forward positioning, React Native kept as shipped evidence
 - [x] Hero, title, and meta description rewritten as "Software Engineer · Mobile & Full-Stack"
-- [x] Stats bar: 18+ projects, Flutter & RN, 2 apps live, 5+ years engineering
+- [x] Stats bar: 12+ projects, Flutter, 2 apps live, 5+ years engineering
 - [x] About Me rewritten from the current resume
 - [x] RoninFlow "Currently Building" card retagged to Flutter
 - [x] Skills grid expanded to 10 cards (adds Go, Next.js, Python, Oracle, local LLMs)
 - [x] Four new 2026 projects: Al-Mouyasser Hub, MSR, HR CV Screener, SFA Distribution
 - [x] Al-Mouyasser retitled "Software Engineer" with Flutter-forward tags
-- [x] Road extended to five S-curves and 18 nodes
+- [x] Road extended to five S-curves and 17 nodes
 - [x] Card positions derived from the viewBox instead of hand-tuned percentages
 - [x] Emoji icon chips for milestones with no app icon
 - [x] Per-project `kind` subtitles, so a Go service is not labelled a mobile app
 - [x] **Mobile fallback cards now actually render** (the container was always empty)
-- [x] Road SVG hidden below 768px, where 18 nodes were unreadable
+- [x] Road SVG hidden below 768px, where 17 nodes were unreadable
 - [x] `interactive.html` is a real Vite build entry; duplicate copy in `public/` removed
 - [x] Icons no longer ship twice (11 MB build → 6.5 MB)
 - [x] `public/_headers` for Cloudflare caching and security headers
 - [x] `package.json` metadata corrected (was "Your Name" and a car-garden description)
 - [x] `DEPLOY.md` written
-- [x] Verified: production build succeeds, and the built page executes with 18/18
+- [x] Primary stack stat reads Flutter only; Ticket Management System removed
+- [x] IT Checklist node slid along curve 2 to close the gap the removal left
+- [x] Icon paths fall back to `src/assets/icons/` when opened off disk
+- [x] Verified: production build succeeds, and the built page executes with 17/17
       cards, working scroll reveal, counters, theme toggle, and hover isolation
 
 ## What's Pending
