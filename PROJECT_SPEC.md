@@ -49,12 +49,14 @@ covering career history and projects, plus a hidden ronin side-scroller mode.
 - **LinkedIn:** https://linkedin.com/in/samerjameel
 - **Email:** samerjameel00@gmail.com
 - **WhatsApp:** +964 781 282 4046 · **Telegram:** @samerjameel
-- **Resume:** https://docs.google.com/document/d/e/2PACX-1vQEupLZiAKOK2jPI7aAUCJOOMjSpCiiT96IV9kyhB5ZcofPfWMU2dkH9TSoIXN44A/pub
+- **Resume:** https://docs.google.com/document/d/e/2PACX-1vRDblN0onn5fer95iVLDvMb6nzudNSBkrY72_X5TLUqjOtk4aTb9i5Pc8t2-a9r4g/pub
 
-> The nav Resume button still points at the older Google Docs publication. The
-> newest resume is `Samer Jameel Resume.docx` in the repo root, which is what this
-> spec and the site copy are written from. Re-publish that document and update the
-> link when convenient.
+> The Resume links in the nav and the contact section both point at the current
+> publication, which matches `Samer Jameel Resume.docx` in the repo root. Verified
+> 2026-10-17: returns HTTP 200 to an anonymous browser and contains the Flutter,
+> SFA Distribution, and HR CV Screener content. Note that `curl` without a browser
+> User-Agent gets a redirect to a Google sign-in page, so that is not a useful way
+> to test it.
 
 ## Positioning
 Flutter is presented as the current direction; React Native as the proven,
@@ -180,6 +182,29 @@ Fullscreen overlay iframing `interactive.html`. CSS ronin character, parallax
 Japanese world, Arrow/WASD + Space controls, four buildings (torii, dojo, temple,
 zen garden) with slide-in info panels.
 
+## Analytics
+
+Two Google tags are loaded from the top of `<head>`, with the GTM `<noscript>`
+iframe just before `</body>`:
+
+| Tag | ID |
+|---|---|
+| Google Tag Manager | `GTM-PGCQJPM5` |
+| Google Analytics 4 via gtag.js | `G-6C3W8552N0` |
+
+> **Check for double-counted pageviews.** Running a GTM container *and* a direct
+> gtag.js snippet is fine only if the container does not also fire a GA4
+> configuration tag for `G-6C3W8552N0`. If it does, every visit is counted twice.
+> Confirm in GTM Preview, or watch the GA4 Realtime report during a single visit.
+> If the container does hold that tag, drop the gtag.js block from `<head>` and
+> let GTM own GA4.
+
+> **Keep `<meta charset="UTF-8">` within the first 1024 bytes of the file.** The
+> tracking snippets sit above it, leaving about 240 bytes of headroom. Adding
+> another snippet there would push the charset declaration past the limit, and the
+> page would silently lose its Japanese text and em-dashes. Safest fix is to move
+> the charset and viewport meta tags back above the tracking block.
+
 ## Ambient Effects
 - **Cherry blossoms:** pink petals falling continuously
 - **Fireflies:** gold glowing dots drifting
@@ -287,7 +312,6 @@ originals and the off-disk fallback. The preferred workflow is still
 - [ ] Move DNS from Namecheap to Cloudflare, then attach theronindev.com (Phase 2)
 - [ ] **Resize the oversized icons.** 6.5 MB of a 6.5 MB build is icons displayed
       at 48-52px. `cosmetica.png` alone is 2.2 MB. See the DEPLOY.md section.
-- [ ] Re-publish the resume and update the Google Docs link in the nav and contact section
 - [ ] Confirm the real dates for the four 2026 projects
 - [ ] Optional: real app icons for Hub, MSR, CV Screener, and SFA (emoji for now)
 
