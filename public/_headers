@@ -1,0 +1,17 @@
+# Cloudflare Pages response headers.
+# Docs: https://developers.cloudflare.com/pages/configuration/headers/
+
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: geolocation=(), microphone=(), camera=()
+  # SAMEORIGIN, not DENY: index.html loads interactive.html in an iframe.
+  X-Frame-Options: SAMEORIGIN
+
+# Vite fingerprints these filenames, so they can be cached forever.
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Roadmap card icons keep stable names, so cache for a week only.
+/icons/*
+  Cache-Control: public, max-age=604800

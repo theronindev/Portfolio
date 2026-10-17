@@ -1,0 +1,1530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Ronin Dev - V3: Interactive Ronin World</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0f;
+      --surface: #14141e;
+      --surface-light: #1e1e2e;
+      --crimson: #c0392b;
+      --crimson-light: #e74c3c;
+      --crimson-dark: #922b21;
+      --gold: #d4a017;
+      --gold-light: #f0c040;
+      --sakura: #f4b4c6;
+      --text: #e8e6e3;
+      --text-dim: #a0a0a8;
+      --text-muted: #555560;
+      --border: #2a2a3a;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow: hidden;
+      height: 100vh;
+      user-select: none;
+    }
+
+    /* ===== WORLD CONTAINER ===== */
+    .world {
+      position: fixed;
+      inset: 0;
+      overflow: hidden;
+    }
+
+    /* ===== PARALLAX LAYERS ===== */
+    .layer {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      height: 100%;
+      will-change: transform;
+    }
+
+    /* Sky */
+    .sky {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(
+        to bottom,
+        #050510 0%,
+        #0a0a1a 30%,
+        #0f1020 50%,
+        #141428 70%,
+        #1a1a30 100%
+      );
+    }
+
+    /* Stars */
+    .stars {
+      position: absolute;
+      inset: 0;
+    }
+
+    .star {
+      position: absolute;
+      width: 2px;
+      height: 2px;
+      background: #fff;
+      border-radius: 50%;
+      opacity: 0.6;
+      animation: twinkle 3s ease-in-out infinite;
+    }
+
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.3; }
+      50% { opacity: 0.9; }
+    }
+
+    /* Moon */
+    .moon {
+      position: absolute;
+      top: 8%;
+      right: 15%;
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #f5f0e0, #d4c89a 60%, #a09060);
+      box-shadow: 0 0 50px rgba(212,200,154,0.25), 0 0 100px rgba(212,200,154,0.1);
+    }
+
+    /* Mountains (far) */
+    .mountains-far {
+      width: 6000px;
+      height: 350px;
+      bottom: 200px;
+    }
+
+    .mountain {
+      position: absolute;
+      bottom: 0;
+      width: 0;
+      height: 0;
+      border-style: solid;
+    }
+
+    /* Mountains (near) */
+    .mountains-near {
+      width: 6000px;
+      height: 280px;
+      bottom: 160px;
+    }
+
+    /* Ground */
+    .ground-layer {
+      width: 6000px;
+      height: 280px;
+      bottom: 0;
+      background: linear-gradient(to bottom, #0c0e0a 0%, #090b07 40%, #060806 100%);
+    }
+
+    /* Stone path */
+    .stone-path {
+      position: absolute;
+      bottom: 20px;
+      left: 0;
+      width: 6000px;
+      height: 50px;
+      background: repeating-linear-gradient(
+        90deg,
+        #1e1a16 0px,
+        #2a2520 18px,
+        #141210 20px,
+        #1e1a16 22px
+      );
+      border-top: 2px solid #2a2520;
+      border-bottom: 2px solid #0e0c0a;
+      box-shadow: 0 -2px 15px rgba(0,0,0,0.5);
+    }
+
+    /* ===== BUILDINGS ===== */
+    .building {
+      position: absolute;
+      bottom: 70px;
+      cursor: pointer;
+      transition: filter 0.3s;
+    }
+
+    .building:hover { filter: brightness(1.2); }
+
+    .building-glow {
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 120%;
+      height: 20px;
+      background: radial-gradient(ellipse, rgba(240,192,64,0.15) 0%, transparent 70%);
+      opacity: 0;
+      transition: opacity 0.5s;
+    }
+
+    .building.near .building-glow { opacity: 1; }
+
+    /* Torii Gate */
+    .torii-gate {
+      width: 160px;
+      height: 180px;
+      left: 600px;
+    }
+
+    .torii-top-beam {
+      position: absolute;
+      top: 0;
+      left: -15px;
+      width: 190px;
+      height: 14px;
+      background: var(--crimson);
+      border-radius: 3px;
+      box-shadow: 0 -4px 0 var(--crimson-dark);
+    }
+
+    .torii-mid-beam {
+      position: absolute;
+      top: 30px;
+      left: 5px;
+      width: 150px;
+      height: 10px;
+      background: var(--crimson-dark);
+      border-radius: 2px;
+    }
+
+    .torii-pillar {
+      position: absolute;
+      top: 10px;
+      width: 14px;
+      height: 170px;
+      background: linear-gradient(90deg, var(--crimson-dark), var(--crimson), var(--crimson-dark));
+      border-radius: 2px;
+    }
+
+    .torii-pillar-l { left: 20px; }
+    .torii-pillar-r { right: 20px; }
+
+    /* Dojo */
+    .dojo {
+      width: 200px;
+      height: 160px;
+      left: 1400px;
+    }
+
+    .dojo-roof {
+      position: absolute;
+      top: 0;
+      left: -20px;
+      width: 240px;
+      height: 60px;
+      background: linear-gradient(to bottom, #2a1a10, #3d2b1f);
+      clip-path: polygon(0% 100%, 50% 0%, 100% 100%);
+    }
+
+    .dojo-body {
+      position: absolute;
+      top: 55px;
+      left: 10px;
+      width: 180px;
+      height: 105px;
+      background: linear-gradient(to bottom, #1a1510, #14100a);
+      border: 1px solid #2a2520;
+    }
+
+    .dojo-door {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 40px;
+      height: 60px;
+      background: #0a0805;
+      border: 1px solid #3a3530;
+      border-bottom: none;
+    }
+
+    .dojo-window {
+      position: absolute;
+      top: 15px;
+      width: 30px;
+      height: 25px;
+      background: rgba(240,192,64,0.08);
+      border: 1px solid #3a3530;
+    }
+
+    .dojo-window-l { left: 20px; }
+    .dojo-window-r { right: 20px; }
+
+    .dojo-lantern {
+      position: absolute;
+      bottom: 70px;
+      width: 16px;
+      height: 24px;
+      background: radial-gradient(circle, rgba(240,192,64,0.6), rgba(192,57,43,0.4));
+      border-radius: 4px;
+      box-shadow: 0 0 15px rgba(240,192,64,0.3);
+    }
+
+    .dojo-lantern-l { left: -20px; }
+    .dojo-lantern-r { right: -20px; }
+
+    /* Temple */
+    .temple {
+      width: 260px;
+      height: 200px;
+      left: 2400px;
+    }
+
+    .temple-roof1 {
+      position: absolute;
+      top: 0;
+      left: -30px;
+      width: 320px;
+      height: 50px;
+      background: #2a1a10;
+      clip-path: polygon(5% 100%, 50% 0%, 95% 100%);
+    }
+
+    .temple-roof2 {
+      position: absolute;
+      top: 35px;
+      left: -15px;
+      width: 290px;
+      height: 40px;
+      background: #3d2b1f;
+      clip-path: polygon(3% 100%, 50% 0%, 97% 100%);
+    }
+
+    .temple-body {
+      position: absolute;
+      top: 70px;
+      left: 15px;
+      width: 230px;
+      height: 130px;
+      background: linear-gradient(to bottom, #16120e, #100e0a);
+      border: 1px solid #2a2520;
+    }
+
+    .temple-pillars {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: space-between;
+      padding: 0 10px;
+    }
+
+    .temple-pillar {
+      width: 8px;
+      height: 100%;
+      background: #2a2015;
+    }
+
+    .temple-banner {
+      position: absolute;
+      top: 15px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 80px;
+      background: var(--crimson-dark);
+      border-radius: 0 0 4px 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Noto Serif JP', serif;
+      font-size: 1rem;
+      color: var(--gold-light);
+      writing-mode: vertical-rl;
+      letter-spacing: 0.2em;
+      border: 1px solid rgba(192,57,43,0.4);
+    }
+
+    /* Zen Garden */
+    .zen-garden {
+      width: 180px;
+      height: 100px;
+      left: 3400px;
+    }
+
+    .zen-sand {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 180px;
+      height: 50px;
+      background: repeating-linear-gradient(
+        0deg,
+        #2a2520 0px,
+        #2a2520 2px,
+        #1a1510 2px,
+        #1a1510 8px
+      );
+      border-radius: 4px;
+      border: 1px solid #3a3530;
+    }
+
+    .zen-rock {
+      position: absolute;
+      bottom: 45px;
+      width: 30px;
+      height: 25px;
+      background: radial-gradient(ellipse at 40% 30%, #4a4540, #2a2520);
+      border-radius: 40% 50% 45% 55%;
+    }
+
+    .zen-rock-1 { left: 30px; }
+    .zen-rock-2 { left: 100px; width: 20px; height: 18px; }
+
+    .zen-lantern {
+      position: absolute;
+      bottom: 50px;
+      right: 10px;
+      width: 24px;
+      height: 50px;
+    }
+
+    .zen-lantern-top {
+      width: 24px;
+      height: 8px;
+      background: #3a3530;
+      border-radius: 2px;
+    }
+
+    .zen-lantern-light {
+      width: 20px;
+      height: 20px;
+      margin: 2px auto;
+      background: radial-gradient(circle, rgba(240,192,64,0.5), rgba(240,192,64,0.1));
+      border: 1px solid #4a4540;
+      box-shadow: 0 0 20px rgba(240,192,64,0.2);
+    }
+
+    .zen-lantern-base {
+      width: 12px;
+      height: 18px;
+      margin: 0 auto;
+      background: #3a3530;
+    }
+
+    /* ===== STONE LANTERNS ALONG PATH ===== */
+    .path-lantern {
+      position: absolute;
+      bottom: 70px;
+      width: 16px;
+      height: 36px;
+    }
+
+    .path-lantern-head {
+      width: 16px;
+      height: 6px;
+      background: #3a3530;
+      border-radius: 2px;
+    }
+
+    .path-lantern-glow {
+      width: 12px;
+      height: 12px;
+      margin: 1px auto;
+      background: rgba(50,40,30,0.5);
+      border: 1px solid #3a3530;
+      border-radius: 1px;
+      transition: all 0.5s;
+    }
+
+    .path-lantern.lit .path-lantern-glow {
+      background: radial-gradient(circle, rgba(240,192,64,0.6), rgba(240,192,64,0.1));
+      box-shadow: 0 0 12px rgba(240,192,64,0.3);
+    }
+
+    .path-lantern-stem {
+      width: 4px;
+      height: 16px;
+      margin: 0 auto;
+      background: #3a3530;
+    }
+
+    /* ===== RONIN CHARACTER ===== */
+    .ronin {
+      position: absolute;
+      bottom: 68px;
+      width: 60px;
+      height: 110px;
+      z-index: 50;
+      transition: none;
+    }
+
+    .ronin.face-left { transform: scaleX(-1); }
+
+    /* Ronin body parts */
+    .ronin-head {
+      position: absolute;
+      top: 0;
+      left: 16px;
+      width: 28px;
+      height: 28px;
+      background: radial-gradient(circle at 40% 40%, #e0c8a0, #c4a878);
+      border-radius: 50%;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+    }
+
+    /* Hair/topknot */
+    .ronin-hair {
+      position: absolute;
+      top: -5px;
+      left: 18px;
+      width: 24px;
+      height: 16px;
+      background: #1a1a1a;
+      border-radius: 50% 50% 0 0;
+    }
+
+    .ronin-topknot {
+      position: absolute;
+      top: -16px;
+      left: 24px;
+      width: 12px;
+      height: 16px;
+      background: #1a1a1a;
+      border-radius: 6px 6px 0 0;
+    }
+
+    /* Body */
+    .ronin-body {
+      position: absolute;
+      top: 26px;
+      left: 8px;
+      width: 44px;
+      height: 44px;
+      background: linear-gradient(to bottom, #1a1520, #12101a);
+      border-radius: 6px 6px 0 0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+
+    /* Kimono V-collar */
+    .ronin-kimono {
+      position: absolute;
+      top: 28px;
+      left: 22px;
+      width: 16px;
+      height: 38px;
+      border-left: 3px solid var(--crimson-dark);
+      opacity: 0.8;
+    }
+
+    /* Obi (belt) */
+    .ronin-body::after {
+      content: '';
+      position: absolute;
+      bottom: 6px;
+      left: 0;
+      width: 100%;
+      height: 6px;
+      background: var(--crimson-dark);
+      opacity: 0.6;
+    }
+
+    /* Katana on back */
+    .ronin-katana {
+      position: absolute;
+      top: 8px;
+      left: 46px;
+      width: 5px;
+      height: 60px;
+      background: linear-gradient(to bottom, #5a5550, #3a3530, #2a2520);
+      border-radius: 2px;
+      transform: rotate(-15deg);
+      transform-origin: top center;
+    }
+
+    .ronin-katana-guard {
+      position: absolute;
+      top: 12px;
+      left: -4px;
+      width: 14px;
+      height: 4px;
+      background: var(--gold);
+      border-radius: 2px;
+      box-shadow: 0 0 6px rgba(212,160,23,0.3);
+    }
+
+    /* Legs */
+    .ronin-legs {
+      position: absolute;
+      top: 68px;
+      left: 12px;
+      width: 36px;
+      height: 38px;
+      display: flex;
+      gap: 6px;
+    }
+
+    .ronin-leg {
+      width: 14px;
+      height: 38px;
+      background: linear-gradient(to bottom, #16121a, #0e0c12);
+      border-radius: 0 0 4px 4px;
+    }
+
+    /* Sandals */
+    .ronin-leg::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      width: 16px;
+      height: 4px;
+      background: #2a2015;
+      border-radius: 2px;
+    }
+
+    /* Walking animation */
+    .ronin.walking .ronin-leg:first-child {
+      animation: walkLegL 0.35s ease-in-out infinite;
+    }
+
+    .ronin.walking .ronin-leg:last-child {
+      animation: walkLegR 0.35s ease-in-out infinite;
+    }
+
+    .ronin.walking .ronin-body {
+      animation: walkBob 0.35s ease-in-out infinite;
+    }
+
+    .ronin.walking .ronin-katana {
+      animation: katanaSway 0.7s ease-in-out infinite;
+    }
+
+    @keyframes walkLegL {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-4px) rotate(-12deg); }
+    }
+
+    @keyframes walkLegR {
+      0%, 100% { transform: translateY(-4px) rotate(12deg); }
+      50% { transform: translateY(0) rotate(0deg); }
+    }
+
+    @keyframes walkBob {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-3px); }
+    }
+
+    @keyframes katanaSway {
+      0%, 100% { transform: rotate(-15deg); }
+      50% { transform: rotate(-12deg); }
+    }
+
+    /* Idle breathing */
+    .ronin.idle .ronin-body {
+      animation: breathe 3s ease-in-out infinite;
+    }
+
+    @keyframes breathe {
+      0%, 100% { transform: scaleY(1); }
+      50% { transform: scaleY(1.02); }
+    }
+
+    /* Katana slash */
+    .slash-effect {
+      position: absolute;
+      width: 80px;
+      height: 80px;
+      pointer-events: none;
+      z-index: 60;
+      opacity: 0;
+    }
+
+    .slash-effect.active {
+      animation: slashAnim 0.4s ease-out forwards;
+    }
+
+    .slash-line {
+      position: absolute;
+      top: 50%;
+      left: 10%;
+      width: 70%;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, var(--crimson-light), var(--gold-light), transparent);
+      border-radius: 2px;
+      transform: rotate(-30deg);
+      box-shadow: 0 0 10px var(--crimson-light);
+    }
+
+    .slash-line-2 {
+      transform: rotate(10deg);
+      animation-delay: 0.05s;
+    }
+
+    @keyframes slashAnim {
+      0% { opacity: 0; transform: scale(0.5); }
+      30% { opacity: 1; transform: scale(1.2); }
+      100% { opacity: 0; transform: scale(1.5); }
+    }
+
+    /* ===== INFO PANEL ===== */
+    .info-panel {
+      position: fixed;
+      top: 0;
+      right: -450px;
+      width: 420px;
+      max-width: 90vw;
+      height: 100vh;
+      background: rgba(20,20,30,0.95);
+      backdrop-filter: blur(15px);
+      border-left: 1px solid var(--border);
+      z-index: 200;
+      padding: 2rem;
+      overflow-y: auto;
+      transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .info-panel.open { right: 0; }
+
+    .panel-close {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      width: 36px;
+      height: 36px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text-dim);
+      font-size: 1.2rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .panel-close:hover {
+      border-color: var(--crimson);
+      color: var(--crimson-light);
+    }
+
+    .panel-label {
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--crimson-light);
+      margin-bottom: 0.75rem;
+    }
+
+    .panel-title {
+      font-family: 'Noto Serif JP', serif;
+      font-size: 1.6rem;
+      font-weight: 700;
+      margin-bottom: 1.25rem;
+      color: var(--text);
+    }
+
+    .panel-text {
+      color: var(--text-dim);
+      line-height: 1.7;
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+    }
+
+    .panel-text strong { color: var(--crimson-light); }
+
+    .panel-divider {
+      width: 40px;
+      height: 2px;
+      background: var(--crimson);
+      margin: 1.5rem 0;
+    }
+
+    .tags { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-top: 0.75rem; }
+
+    .tag {
+      padding: 3px 10px;
+      font-size: 0.7rem;
+      font-weight: 500;
+      border-radius: 50px;
+      background: rgba(192,57,43,0.1);
+      color: var(--crimson-light);
+      border: 1px solid rgba(192,57,43,0.2);
+    }
+
+    .tag.gold { background: rgba(212,160,23,0.1); color: var(--gold-light); border-color: rgba(212,160,23,0.2); }
+
+    /* Project items in panel */
+    .project-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.25rem;
+      margin-bottom: 1rem;
+      border-left: 3px solid var(--crimson);
+    }
+
+    .project-item h4 {
+      font-family: 'Noto Serif JP', serif;
+      font-size: 0.95rem;
+      margin-bottom: 0.4rem;
+      color: var(--text);
+    }
+
+    .project-item p {
+      font-size: 0.82rem;
+      color: var(--text-dim);
+      line-height: 1.5;
+      margin-bottom: 0.5rem;
+    }
+
+    /* Skills list in panel */
+    .skill-grid-panel {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+    }
+
+    .skill-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.75rem;
+      font-size: 0.82rem;
+      color: var(--text-dim);
+      text-align: center;
+    }
+
+    .skill-item strong {
+      display: block;
+      color: var(--text);
+      margin-bottom: 0.2rem;
+      font-size: 0.85rem;
+    }
+
+    /* Contact links in panel */
+    .contact-link-panel {
+      display: block;
+      padding: 0.85rem 1rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      text-decoration: none;
+      margin-bottom: 0.75rem;
+      transition: all 0.2s;
+      font-size: 0.9rem;
+    }
+
+    .contact-link-panel:hover {
+      border-color: var(--crimson);
+      transform: translateX(4px);
+    }
+
+    .contact-link-panel span {
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      display: block;
+      margin-top: 0.2rem;
+    }
+
+    /* ===== HUD ===== */
+    .hud {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      padding: 0.75rem 1.5rem;
+      background: rgba(20,20,30,0.85);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border);
+      border-radius: 50px;
+    }
+
+    .hud-keys {
+      display: flex;
+      gap: 0.35rem;
+      align-items: center;
+    }
+
+    .hud-key {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      background: var(--surface-light);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 0.75rem;
+      color: var(--text-dim);
+    }
+
+    .hud-text {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .hud-sep {
+      width: 1px;
+      height: 20px;
+      background: var(--border);
+    }
+
+    .hud-slash {
+      font-size: 0.75rem;
+      color: var(--gold-light);
+    }
+
+    /* Building labels */
+    .building-label {
+      position: absolute;
+      top: -30px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 4px 12px;
+      background: rgba(20,20,30,0.85);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      white-space: nowrap;
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+    }
+
+    .building.near .building-label {
+      opacity: 1;
+      color: var(--gold-light);
+      border-color: rgba(212,160,23,0.3);
+    }
+
+    /* Cherry blossom tree */
+    .sakura-tree {
+      position: absolute;
+      bottom: 70px;
+    }
+
+    .sakura-trunk {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 12px;
+      height: 60px;
+      background: linear-gradient(90deg, #2a1a0f, #3d2b1f, #2a1a0f);
+      border-radius: 2px;
+    }
+
+    .sakura-crown {
+      position: absolute;
+      bottom: 45px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 70px;
+      height: 55px;
+      background: radial-gradient(ellipse, rgba(244,180,198,0.25), rgba(200,132,154,0.1));
+      border-radius: 50%;
+      filter: blur(2px);
+    }
+
+    /* Bamboo */
+    .bamboo {
+      position: absolute;
+      bottom: 70px;
+    }
+
+    .bamboo-stalk {
+      width: 6px;
+      background: linear-gradient(90deg, #1a3a1a, #2a5a2a, #1a3a1a);
+      border-radius: 3px;
+      position: absolute;
+      bottom: 0;
+    }
+
+    .bamboo-leaf {
+      position: absolute;
+      width: 20px;
+      height: 8px;
+      background: #1a4a1a;
+      border-radius: 0 50% 50% 0;
+      transform-origin: left center;
+    }
+
+    /* Mist */
+    .mist {
+      position: absolute;
+      bottom: 160px;
+      width: 300px;
+      height: 60px;
+      background: radial-gradient(ellipse, rgba(20,20,40,0.4), transparent);
+      filter: blur(20px);
+      animation: mistDrift 15s ease-in-out infinite;
+    }
+
+    @keyframes mistDrift {
+      0%, 100% { transform: translateX(0); opacity: 0.3; }
+      50% { transform: translateX(50px); opacity: 0.6; }
+    }
+
+    /* Petals */
+    .petals-container {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 90;
+      overflow: hidden;
+    }
+
+    .petal {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      background: var(--sakura);
+      border-radius: 50% 0 50% 50%;
+      opacity: 0;
+      animation: drift linear infinite;
+    }
+
+    @keyframes drift {
+      0% { opacity: 0; transform: translateY(-10px) rotate(0deg) translateX(0); }
+      10% { opacity: 0.5; }
+      90% { opacity: 0.3; }
+      100% { opacity: 0; transform: translateY(100vh) rotate(540deg) translateX(60px); }
+    }
+
+    /* Prompt to start */
+    .start-prompt {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 150;
+      text-align: center;
+      padding: 3rem;
+      background: rgba(20,20,30,0.9);
+      backdrop-filter: blur(15px);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      max-width: 400px;
+      width: 90%;
+      transition: all 0.5s;
+    }
+
+    .start-prompt.hidden {
+      opacity: 0;
+      pointer-events: none;
+      transform: translate(-50%, -50%) scale(0.9);
+    }
+
+    .start-prompt h2 {
+      font-family: 'Noto Serif JP', serif;
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .start-prompt .jp {
+      color: var(--gold);
+      font-size: 0.85rem;
+      margin-bottom: 1rem;
+    }
+
+    .start-prompt p {
+      color: var(--text-dim);
+      font-size: 0.85rem;
+      line-height: 1.6;
+      margin-bottom: 1.5rem;
+    }
+
+    .start-btn {
+      padding: 0.75rem 2rem;
+      background: linear-gradient(135deg, var(--crimson), var(--crimson-dark));
+      color: var(--text);
+      border: none;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .start-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(192,57,43,0.3);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="petals-container" id="petals"></div>
+
+  <!-- Start prompt -->
+  <div class="start-prompt" id="startPrompt">
+    <h2>The Ronin Dev</h2>
+    <div class="jp">浪人の道 &mdash; Path of the Ronin</div>
+    <p>Walk through a moonlit Japanese world. Approach landmarks and press <strong>Space</strong> to draw your katana and reveal my story.</p>
+    <button class="start-btn" id="startBtn">Begin Journey</button>
+  </div>
+
+  <!-- World -->
+  <div class="world" id="world">
+    <!-- Sky layer (static) -->
+    <div class="layer sky" id="skyLayer">
+      <div class="stars" id="stars"></div>
+      <div class="moon"></div>
+    </div>
+
+    <!-- Mountains far (slow parallax) -->
+    <div class="layer mountains-far" id="mtFar"></div>
+
+    <!-- Mountains near (medium parallax) -->
+    <div class="layer mountains-near" id="mtNear"></div>
+
+    <!-- Ground (moves with character) -->
+    <div class="layer ground-layer" id="ground">
+      <div class="stone-path"></div>
+
+      <!-- Path lanterns -->
+      <div class="path-lantern" id="lantern0" style="left:300px;">
+        <div class="path-lantern-head"></div>
+        <div class="path-lantern-glow"></div>
+        <div class="path-lantern-stem"></div>
+      </div>
+      <div class="path-lantern" id="lantern1" style="left:900px;">
+        <div class="path-lantern-head"></div>
+        <div class="path-lantern-glow"></div>
+        <div class="path-lantern-stem"></div>
+      </div>
+      <div class="path-lantern" id="lantern2" style="left:1700px;">
+        <div class="path-lantern-head"></div>
+        <div class="path-lantern-glow"></div>
+        <div class="path-lantern-stem"></div>
+      </div>
+      <div class="path-lantern" id="lantern3" style="left:2700px;">
+        <div class="path-lantern-head"></div>
+        <div class="path-lantern-glow"></div>
+        <div class="path-lantern-stem"></div>
+      </div>
+      <div class="path-lantern" id="lantern4" style="left:3700px;">
+        <div class="path-lantern-head"></div>
+        <div class="path-lantern-glow"></div>
+        <div class="path-lantern-stem"></div>
+      </div>
+
+      <!-- Cherry blossom trees -->
+      <div class="sakura-tree" style="left:200px;">
+        <div class="sakura-trunk"></div>
+        <div class="sakura-crown"></div>
+      </div>
+      <div class="sakura-tree" style="left:1100px;">
+        <div class="sakura-trunk"></div>
+        <div class="sakura-crown"></div>
+      </div>
+      <div class="sakura-tree" style="left:2000px;">
+        <div class="sakura-trunk"></div>
+        <div class="sakura-crown"></div>
+      </div>
+      <div class="sakura-tree" style="left:3100px;">
+        <div class="sakura-trunk"></div>
+        <div class="sakura-crown"></div>
+      </div>
+
+      <!-- Bamboo clusters -->
+      <div class="bamboo" style="left:450px;">
+        <div class="bamboo-stalk" style="height:80px;left:0;"></div>
+        <div class="bamboo-stalk" style="height:95px;left:10px;"></div>
+        <div class="bamboo-stalk" style="height:70px;left:18px;"></div>
+      </div>
+      <div class="bamboo" style="left:1900px;">
+        <div class="bamboo-stalk" style="height:90px;left:0;"></div>
+        <div class="bamboo-stalk" style="height:75px;left:10px;"></div>
+      </div>
+
+      <!-- Mist -->
+      <div class="mist" style="left:800px;"></div>
+      <div class="mist" style="left:2200px; animation-delay:-7s;"></div>
+      <div class="mist" style="left:3500px; animation-delay:-3s;"></div>
+
+      <!-- BUILDINGS (Info spots) -->
+      <!-- Torii Gate = About -->
+      <div class="building torii-gate" id="building-about" data-section="about">
+        <div class="building-label">Press SPACE &mdash; About Me</div>
+        <div class="building-glow"></div>
+        <div class="torii-top-beam"></div>
+        <div class="torii-mid-beam"></div>
+        <div class="torii-pillar torii-pillar-l"></div>
+        <div class="torii-pillar torii-pillar-r"></div>
+      </div>
+
+      <!-- Dojo = Skills -->
+      <div class="building dojo" id="building-skills" data-section="skills">
+        <div class="building-label">Press SPACE &mdash; Skills</div>
+        <div class="building-glow"></div>
+        <div class="dojo-roof"></div>
+        <div class="dojo-body">
+          <div class="dojo-window dojo-window-l"></div>
+          <div class="dojo-window dojo-window-r"></div>
+          <div class="dojo-door"></div>
+        </div>
+        <div class="dojo-lantern dojo-lantern-l"></div>
+        <div class="dojo-lantern dojo-lantern-r"></div>
+      </div>
+
+      <!-- Temple = Projects -->
+      <div class="building temple" id="building-projects" data-section="projects">
+        <div class="building-label">Press SPACE &mdash; Projects</div>
+        <div class="building-glow"></div>
+        <div class="temple-roof1"></div>
+        <div class="temple-roof2"></div>
+        <div class="temple-body">
+          <div class="temple-pillars">
+            <div class="temple-pillar"></div>
+            <div class="temple-pillar"></div>
+            <div class="temple-pillar"></div>
+            <div class="temple-pillar"></div>
+          </div>
+          <div class="temple-banner">寺院</div>
+        </div>
+      </div>
+
+      <!-- Zen Garden = Contact -->
+      <div class="building zen-garden" id="building-contact" data-section="contact">
+        <div class="building-label">Press SPACE &mdash; Contact</div>
+        <div class="building-glow"></div>
+        <div class="zen-sand"></div>
+        <div class="zen-rock zen-rock-1"></div>
+        <div class="zen-rock zen-rock-2"></div>
+        <div class="zen-lantern">
+          <div class="zen-lantern-top"></div>
+          <div class="zen-lantern-light"></div>
+          <div class="zen-lantern-base"></div>
+        </div>
+      </div>
+
+      <!-- RONIN -->
+      <div class="ronin idle" id="ronin" style="left:100px;">
+        <div class="ronin-topknot"></div>
+        <div class="ronin-hair"></div>
+        <div class="ronin-head"></div>
+        <div class="ronin-body"></div>
+        <div class="ronin-kimono"></div>
+        <div class="ronin-katana">
+          <div class="ronin-katana-guard"></div>
+        </div>
+        <div class="ronin-legs">
+          <div class="ronin-leg"></div>
+          <div class="ronin-leg"></div>
+        </div>
+      </div>
+
+      <!-- Slash effect -->
+      <div class="slash-effect" id="slashEffect">
+        <div class="slash-line"></div>
+        <div class="slash-line slash-line-2"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HUD -->
+  <div class="hud" id="hud" style="display:none;">
+    <div class="hud-keys">
+      <div class="hud-key">&larr;</div>
+      <div class="hud-key">&rarr;</div>
+    </div>
+    <div class="hud-text">Move</div>
+    <div class="hud-sep"></div>
+    <div class="hud-slash">SPACE &mdash; Slash</div>
+  </div>
+
+  <!-- Info Panel -->
+  <div class="info-panel" id="infoPanel">
+    <button class="panel-close" id="panelClose">&times;</button>
+    <div id="panelContent"></div>
+  </div>
+
+  <script>
+    // ===== GAME STATE =====
+    // Expose on window for testing
+    const state = window.gameState = {
+      roninX: 100,
+      speed: 4,
+      moving: false,
+      direction: 'right',
+      keys: { left: false, right: false },
+      panelOpen: false,
+      nearBuilding: null,
+      started: false,
+      worldWidth: 4200,
+    };
+
+    // Elements
+    const ronin = document.getElementById('ronin');
+    const ground = document.getElementById('ground');
+    const mtFar = document.getElementById('mtFar');
+    const mtNear = document.getElementById('mtNear');
+    const infoPanel = document.getElementById('infoPanel');
+    const panelContent = document.getElementById('panelContent');
+    const slashEffect = document.getElementById('slashEffect');
+    const hud = document.getElementById('hud');
+
+    // Buildings data
+    const buildings = [
+      { id: 'building-about', section: 'about', x: 600, width: 160 },
+      { id: 'building-skills', section: 'skills', x: 1400, width: 200 },
+      { id: 'building-projects', section: 'projects', x: 2400, width: 260 },
+      { id: 'building-contact', section: 'contact', x: 3400, width: 180 },
+    ];
+
+    // Lantern positions
+    const lanternPositions = [300, 900, 1700, 2700, 3700];
+
+    // Content
+    const panelData = {
+      about: {
+        label: 'The Torii Gate',
+        title: 'About Me',
+        html: `
+          <p class="panel-text">I'm <strong>The Ronin Dev</strong> &mdash; a mobile developer who walks a solitary path, crafting exceptional cross-platform applications.</p>
+          <p class="panel-text">Specializing in <strong>React Native</strong> and the Expo ecosystem, I build apps that feel native on both iOS and Android.</p>
+          <p class="panel-text">From barcode scanners in Baghdad warehouses to cafe score calculators on Google Play &mdash; I turn ideas into polished, production-ready mobile experiences.</p>
+          <div class="panel-divider"></div>
+          <p class="panel-text">My code is my katana: precise, efficient, and always sharp.</p>
+        `
+      },
+      skills: {
+        label: 'The Dojo',
+        title: 'Battle Skills',
+        html: `
+          <p class="panel-text">Weapons mastered through countless projects:</p>
+          <div class="skill-grid-panel">
+            <div class="skill-item"><strong>React Native</strong>Cross-platform</div>
+            <div class="skill-item"><strong>Expo</strong>SDK & EAS</div>
+            <div class="skill-item"><strong>TypeScript</strong>Type-safe</div>
+            <div class="skill-item"><strong>Node.js</strong>REST APIs</div>
+            <div class="skill-item"><strong>Firebase</strong>Auth & DB</div>
+            <div class="skill-item"><strong>SQL Server</strong>Database</div>
+            <div class="skill-item"><strong>Redux</strong>State Mgmt</div>
+            <div class="skill-item"><strong>Figma</strong>UI/UX</div>
+          </div>
+        `
+      },
+      projects: {
+        label: 'The Temple',
+        title: 'Projects',
+        html: `
+          <div class="project-item">
+            <h4>TanCafe &mdash; Score Calculator</h4>
+            <p>Arabic-first app for TAN CAFE in Baghdad. Score tracking for Dominoes & Cards with fireworks animation. Published on Google Play.</p>
+            <div class="tags"><span class="tag">React Native</span><span class="tag">Expo SDK 54</span><span class="tag gold">Google Play</span></div>
+          </div>
+          <div class="project-item">
+            <h4>Cosmeticca &mdash; Price Lookup</h4>
+            <p>Retail barcode price lookup with Honeywell scanner integration and multi-store inventory.</p>
+            <div class="tags"><span class="tag">React Native</span><span class="tag">PHP</span><span class="tag">SQL Server</span></div>
+          </div>
+          <div class="project-item">
+            <h4>IT Asset Management</h4>
+            <p>Enterprise three-tier solution. Mobile + Node.js API + Next.js dashboard with PDF generation.</p>
+            <div class="tags"><span class="tag">React Native</span><span class="tag">Node.js</span><span class="tag">Next.js</span></div>
+          </div>
+          <div class="project-item">
+            <h4>SK Mobile &mdash; Warehouse</h4>
+            <p>Warehouse ops with barcode scanning, batch management, and real-time status tracking.</p>
+            <div class="tags"><span class="tag">React Native</span><span class="tag">Expo</span><span class="tag">EAS Build</span></div>
+          </div>
+          <div class="project-item">
+            <h4>IoW &mdash; Inventory on Wheels</h4>
+            <p>Inventory counting with barcode scanning, master data matching, and PDF/Excel export.</p>
+            <div class="tags"><span class="tag">React Native</span><span class="tag">SheetJS</span><span class="tag">PDF Export</span></div>
+          </div>
+        `
+      },
+      contact: {
+        label: 'The Zen Garden',
+        title: 'Get in Touch',
+        html: `
+          <p class="panel-text">The path of the ronin is solitary, but collaboration makes us stronger.</p>
+          <div class="panel-divider"></div>
+          <a href="mailto:samerjameel00@gmail.com" class="contact-link-panel">
+            &#9993; samerjameel00@gmail.com
+            <span>Email</span>
+          </a>
+          <a href="https://linkedin.com/in/samerjameel" target="_blank" class="contact-link-panel">
+            &#128188; samerjameel
+            <span>LinkedIn</span>
+          </a>
+          <a href="https://github.com/theronindev" target="_blank" class="contact-link-panel">
+            &#128025; theronindev
+            <span>GitHub</span>
+          </a>
+        `
+      }
+    };
+
+    // ===== STARS =====
+    const starsEl = document.getElementById('stars');
+    for (let i = 0; i < 80; i++) {
+      const star = document.createElement('div');
+      star.className = 'star';
+      star.style.cssText = `left:${Math.random()*100}%;top:${Math.random()*60}%;width:${1+Math.random()*2}px;height:${1+Math.random()*2}px;animation-delay:${Math.random()*3}s;animation-duration:${2+Math.random()*3}s;`;
+      starsEl.appendChild(star);
+    }
+
+    // ===== MOUNTAINS =====
+    function generateMountains(container, count, baseH, color1, color2) {
+      for (let i = 0; i < count; i++) {
+        const m = document.createElement('div');
+        m.className = 'mountain';
+        const w = 200 + Math.random() * 400;
+        const h = baseH + Math.random() * 150;
+        const x = (i / count) * 6000 - 100 + Math.random() * 200;
+        const c = Math.random() > 0.5 ? color1 : color2;
+        m.style.cssText = `left:${x}px;border-width:0 ${w/2}px ${h}px ${w/2}px;border-color:transparent transparent ${c} transparent;`;
+        container.appendChild(m);
+      }
+    }
+    generateMountains(mtFar, 12, 150, '#0d0d18', '#0f0f1a');
+    generateMountains(mtNear, 10, 120, '#0a0a12', '#0c0c16');
+
+    // ===== PETALS =====
+    const petalsEl = document.getElementById('petals');
+    function makePetal() {
+      const p = document.createElement('div');
+      p.className = 'petal';
+      const x = Math.random() * innerWidth;
+      const d = 7 + Math.random() * 8;
+      const s = 5 + Math.random() * 6;
+      p.style.cssText = `left:${x}px;top:-10px;width:${s}px;height:${s}px;animation-duration:${d}s;animation-delay:${Math.random()*2}s;`;
+      petalsEl.appendChild(p);
+      setTimeout(() => p.remove(), (d+2)*1000);
+    }
+    setInterval(makePetal, 800);
+
+    // ===== START =====
+    document.getElementById('startBtn').addEventListener('click', () => {
+      document.getElementById('startPrompt').classList.add('hidden');
+      hud.style.display = 'flex';
+      state.started = true;
+    });
+
+    // ===== CONTROLS =====
+    const keyMap = { ArrowLeft:'left', ArrowRight:'right', a:'left', d:'right', A:'left', D:'right' };
+
+    document.addEventListener('keydown', e => {
+      if (!state.started || state.panelOpen) return;
+      const dir = keyMap[e.key];
+      if (dir) { e.preventDefault(); state.keys[dir] = true; }
+      if (e.key === ' ' || e.key === 'Enter') {
+        e.preventDefault();
+        handleSlash();
+      }
+    });
+
+    document.addEventListener('keyup', e => {
+      const dir = keyMap[e.key];
+      if (dir) state.keys[dir] = false;
+    });
+
+    // ===== SLASH =====
+    function handleSlash() {
+      // Animate slash
+      slashEffect.style.left = (state.roninX + 40) + 'px';
+      slashEffect.style.bottom = '80px';
+      slashEffect.classList.remove('active');
+      void slashEffect.offsetWidth;
+      slashEffect.classList.add('active');
+
+      // Check if near a building
+      if (state.nearBuilding) {
+        const section = state.nearBuilding.dataset.section;
+        openPanel(section);
+      }
+    }
+
+    // ===== PANEL =====
+    function openPanel(section) {
+      const data = panelData[section];
+      if (!data) return;
+      panelContent.innerHTML = `
+        <div class="panel-label">${data.label}</div>
+        <div class="panel-title">${data.title}</div>
+        <div class="panel-divider"></div>
+        ${data.html}
+      `;
+      infoPanel.classList.add('open');
+      state.panelOpen = true;
+    }
+
+    document.getElementById('panelClose').addEventListener('click', () => {
+      infoPanel.classList.remove('open');
+      state.panelOpen = false;
+    });
+
+    // ===== GAME LOOP =====
+    function update() {
+      if (!state.started || state.panelOpen) {
+        requestAnimationFrame(update);
+        return;
+      }
+
+      // Movement
+      let moved = false;
+      if (state.keys.left) {
+        state.roninX = Math.max(20, state.roninX - state.speed);
+        state.direction = 'left';
+        moved = true;
+      }
+      if (state.keys.right) {
+        state.roninX = Math.min(state.worldWidth - 60, state.roninX + state.speed);
+        state.direction = 'right';
+        moved = true;
+      }
+
+      // Update ronin
+      ronin.style.left = state.roninX + 'px';
+      ronin.classList.toggle('face-left', state.direction === 'left');
+      ronin.classList.toggle('walking', moved);
+      ronin.classList.toggle('idle', !moved);
+
+      // Camera
+      const vw = window.innerWidth;
+      const cameraX = Math.max(0, Math.min(state.worldWidth - vw, state.roninX - vw / 2 + 20));
+
+      ground.style.transform = `translateX(${-cameraX}px)`;
+      mtNear.style.transform = `translateX(${-cameraX * 0.3}px)`;
+      mtFar.style.transform = `translateX(${-cameraX * 0.15}px)`;
+
+      // Check building proximity
+      let nearBuilding = null;
+      buildings.forEach(b => {
+        const el = document.getElementById(b.id);
+        const cx = state.roninX + 20;
+        const bCenter = b.x + b.width / 2;
+        const dist = Math.abs(cx - bCenter);
+        if (dist < 100) {
+          el.classList.add('near');
+          nearBuilding = el;
+        } else {
+          el.classList.remove('near');
+        }
+      });
+      state.nearBuilding = nearBuilding;
+
+      // Light lanterns as ronin passes
+      lanternPositions.forEach((lx, i) => {
+        if (state.roninX > lx - 80) {
+          document.getElementById('lantern' + i).classList.add('lit');
+        }
+      });
+
+      requestAnimationFrame(update);
+    }
+
+    requestAnimationFrame(update);
+  </script>
+</body>
+</html>

@@ -19,3 +19,17 @@ out/
 # Misc
 .DS_Store
 .vscode/
+# ---------------------------------------------------------------------------
+# Personal documents — this repo is PUBLIC.
+# resume.txt / resume_dev.txt / the .docx contain date of birth, marital
+# status, and home address. The site deliberately publishes name, email,
+# and phone; it does not publish these. Keep them out of git history.
+# ---------------------------------------------------------------------------
+*.docx
+pro_depends/resume.txt
+pro_depends/resume_dev.txt
+
+# Dev scratch and screenshots
+screenshot-*.png
+screenshots/
+snapshot-*.txt

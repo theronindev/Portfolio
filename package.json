@@ -1,8 +1,9 @@
 {
-  "name": "interactive-portfolio",
-  "version": "1.0.0",
-  "description": "An interactive portfolio website featuring a car navigation system through a garden landscape",
+  "name": "theronindev-portfolio",
+  "version": "2.0.0",
+  "description": "Portfolio of Samer Jameel (The Ronin Dev) — software engineer building cross-platform mobile apps in Flutter and React Native, plus full-stack web and desktop tools. Winding-roadmap journey with a hidden side-scroller mode.",
   "type": "module",
+  "private": true,
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -17,10 +18,12 @@
   },
   "keywords": [
     "portfolio",
-    "interactive",
-    "gsap",
-    "animation"
+    "flutter",
+    "react-native",
+    "full-stack",
+    "vite",
+    "interactive"
   ],
-  "author": "Your Name",
+  "author": "Samer Jameel <samerjameel00@gmail.com> (https://theronindev.com)",
   "license": "MIT"
 }
