@@ -12,11 +12,17 @@ request limit, and builds are free. No credit card or trial is involved.
 | | `theronindev.com` | `theronindev.dev` |
 |---|---|---|
 | Registrar | **Cloudflare** (transferred 2026-11-02) | Namecheap |
-| DNS | **Cloudflare** | Namecheap (`dns1/dns2.namecheaphosting.com`) |
-| Serves | Should be the `portfolio` Worker (see Phase 2) | Old manual upload on Namecheap **Stellar** hosting |
+| DNS | **Cloudflare** | **Cloudflare** |
+| Serves | The `portfolio` Worker (custom domain, + `www`) | 301 to `https://theronindev.com` (Redirect Rule) |
 
-The Stellar hosting plan ends **2027-02-27**. Once `.com` serves the Worker and
-`.dev` redirects to it, the plan can lapse with nothing lost.
+Phases 2 and 3 below are **done**, and kept for reference.
+
+- **`.com` is the only domain being kept.** It renews through **Cloudflare**, the
+  registrar since the transfer, and expires 2028-02-28. Keep auto-renew on there.
+- **`.dev` is being retired.** Auto-renew is off at Namecheap and it expires
+  2027-02-28, after which the redirect simply stops.
+- **Namecheap Stellar hosting is unused.** Auto-renew is off and it lapses 2027-02-27.
+  Nothing depends on it, including email: no `@theronindev.dev` mailbox is in use.
 
 ---
 

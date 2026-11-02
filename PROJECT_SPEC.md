@@ -11,16 +11,22 @@ covering career history and projects, plus a hidden ronin side-scroller mode.
 - **theronindev.dev**
 - `.com` is registered at, and uses DNS from, **Cloudflare** (transferred 2026-11-02).
   `.com` is the primary domain.
-- `.dev` is still registered at Namecheap, with DNS on Namecheap hosting. Plan: move its
-  DNS to Cloudflare and 301 it to `.com`.
+- `.com` registration expires 2028-02-28. Keep auto-renew **on in Cloudflare**, which is
+  now the registrar. The Namecheap auto-renew setting no longer applies to it.
+- `.dev` is registered at Namecheap, with DNS on **Cloudflare**. A Redirect Rule 301s every
+  path (query string kept) to `https://theronindev.com`. Search Console has a change of
+  address from `.dev` to `.com`.
+- `.dev` is being **retired**. Auto-renew is off, and it expires **2027-02-28**. The redirect
+  then stops, which is fine. No `@theronindev.dev` mailbox is in use, so its leftover
+  MX/SPF/DKIM records (Stellar mail, `jellyfish.systems`) can be deleted.
 
 ## Hosting
 - **Cloudflare Worker `portfolio`** (free plan, static assets), building from GitHub
   on every push to `main`: `npm run build`, then `npx wrangler deploy`.
 - `wrangler.jsonc` serves `dist/`. Without it, Wrangler's auto-setup fails on Vite 5.
 - Repo: `github.com/theronindev/Portfolio`
-- Legacy: Namecheap **Stellar** shared hosting still serves an old manual upload on
-  `.dev` until the switch. The plan ends 2027-02-27.
+- Namecheap **Stellar** hosting is no longer used. Auto-renew is off, and it lapses on
+  2027-02-27.
 - See `DEPLOY.md` for the full walkthrough
 
 ## Tech Stack
@@ -340,8 +346,10 @@ originals and the off-disk fallback. The preferred workflow is still
 ## What's Pending
 - [x] Cloudflare Worker connected to the GitHub repo; `wrangler.jsonc` added for the build
 - [x] theronindev.com transferred to Cloudflare (registrar + DNS)
-- [ ] Attach theronindev.com to the Worker, removing the redirect to `.dev` (`DEPLOY.md` Phase 2)
-- [ ] Move `.dev` DNS to Cloudflare and 301 it to `.com` (Phase 3)
+- [x] theronindev.com + www attached to the Worker (2026-11-02)
+- [x] `.dev` DNS on Cloudflare, 301 to `.com`; Search Console change of address done
+- [x] Auto-renew off at Namecheap for Stellar and `.dev`. Both lapse in Feb 2027, intended.
+- [ ] Optional: delete the unused `.dev` mail records in Cloudflare DNS
 - [ ] Let the Namecheap Stellar hosting lapse (ends 2027-02-27)
 - [x] Resized oversized images: icons capped at 256px, `roninicon.png` 256px,
       `me.jpg` 480px; build went from ~6.5 MB to ~0.6 MB. Keep new images under
