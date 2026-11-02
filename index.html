@@ -1,8 +1,10 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!-- Google Tag Manager -->
+  <!-- Google Tag Manager (also loads GA4 G-6C3W8552N0; do not add a separate gtag.js snippet) -->
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
 j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
@@ -10,20 +12,6 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 })(window,document,'script','dataLayer','GTM-PGCQJPM5');</script>
 <!-- End Google Tag Manager -->
 
-    <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-6C3W8552N0"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-6C3W8552N0');
-</script>
-
-
-
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Samer Jameel — The Ronin Dev | Software Engineer</title>
   <meta name="description" content="Samer Jameel (The Ronin Dev) — Software Engineer building cross-platform mobile apps in Flutter and React Native, plus full-stack web and desktop tools. 12+ shipped projects, with TanCafe live on the App Store and Google Play.">
   <link rel="icon" href="src/assets/images/roninicon.png" type="image/png">
@@ -749,13 +737,32 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 
 
     /* ===== SKILLS ===== */
-    .skills-section { padding: 4rem 2rem; max-width: 900px; margin: 0 auto; }
+    .skills-section { padding: 4rem 2rem; max-width: 1080px; margin: 0 auto; }
 
+    /* 10 cards: 5x2 on desktop, 2x5 below 760px, so no row is ever ragged.
+       Cards are ordered by area and carry a small area tag. */
     .skills-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      grid-template-columns: repeat(5, 1fr);
       gap: 1rem;
     }
+    @media (max-width: 760px) { .skills-grid { grid-template-columns: repeat(2, 1fr); gap: 0.75rem; } }
+
+    .skill-area {
+      display: inline-block;
+      margin-bottom: 0.45rem;
+      padding: 2px 9px;
+      border-radius: 50px;
+      font-size: 0.6rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      border: 1px solid transparent;
+    }
+    .area-mobile { color: var(--crimson-light); background: rgba(192,57,43,0.1); border-color: rgba(192,57,43,0.25); }
+    .area-web    { color: var(--gold);         background: rgba(212,160,23,0.1); border-color: rgba(212,160,23,0.25); }
+    .area-data   { color: var(--sakura-dark);  background: rgba(244,180,198,0.1); border-color: rgba(244,180,198,0.28); }
+    .area-ai     { color: var(--text-dim);     background: rgba(160,160,168,0.08); border-color: rgba(160,160,168,0.25); }
 
     .skill-card {
       background: var(--surface);
@@ -772,7 +779,28 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
       box-shadow: 0 8px 25px rgba(0,0,0,0.3);
     }
 
-    .skill-icon { font-size: 1.8rem; margin-bottom: 0.5rem; }
+    .skill-icon {
+      height: 44px;
+      margin-bottom: 0.65rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+    }
+    .skill-icon img {
+      height: 40px;
+      width: auto;
+      max-width: 72px;
+      object-fit: contain;
+      transition: transform 0.3s ease;
+    }
+    .skill-icon img.wide { height: 38px; max-width: 104px; }
+    .skill-card:hover .skill-icon img { transform: scale(1.08); }
+    /* Some logos are dark ink and vanish on the dark theme. Those ship as a
+       pair (name.svg for light, name-dark.svg for dark) and CSS shows one. */
+    .skill-icon .on-light { display: none; }
+    [data-theme="light"] .skill-icon .on-light { display: block; }
+    [data-theme="light"] .skill-icon .on-dark { display: none; }
     .skill-name { font-weight: 600; font-size: 0.85rem; color: var(--text); margin-bottom: 0.25rem; }
     .skill-detail { font-size: 0.75rem; color: var(--text-muted); }
 
@@ -794,6 +822,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
       font-size: 0.9rem;
       transition: all 0.3s ease;
     }
+
+    .contact-link svg { width: 18px; height: 18px; flex: 0 0 18px; fill: var(--crimson-light); transition: fill 0.3s ease; }
+    .contact-link:hover svg { fill: var(--gold-light); }
 
     .contact-link:hover {
       border-color: var(--crimson);
@@ -873,6 +904,16 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
       .nav-btn.resume-btn { display: none; }
     }
   </style>
+  <script>
+    /* Skill logos load from icons/ (public/, served over http). Opened off
+       disk that path does not exist, so retry once against src/assets/icons.
+       Defined in <head> so it exists before any <img> can fail. */
+    function iconFallback(img) {
+      if (img.dataset.retried) { img.remove(); return; }
+      img.dataset.retried = '1';
+      img.src = 'src/assets/icons/' + img.getAttribute('src').split('/').pop();
+    }
+  </script>
 </head>
 <body>
 
@@ -893,7 +934,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         <a href="#contact">Contact</a>
       </div>
       <button class="theme-toggle" onclick="toggleTheme()" title="Toggle light/dark mode" id="themeBtn">&#9790;</button>
-      <a href="https://docs.google.com/document/d/e/2PACX-1vRDblN0onn5fer95iVLDvMb6nzudNSBkrY72_X5TLUqjOtk4aTb9i5Pc8t2-a9r4g/pub" target="_blank" class="nav-btn resume-btn">Resume</a>
+      <a href="https://docs.google.com/document/d/e/2PACX-1vRDblN0onn5fer95iVLDvMb6nzudNSBkrY72_X5TLUqjOtk4aTb9i5Pc8t2-a9r4g/pub" target="_blank" rel="noopener" class="nav-btn resume-btn">Resume</a>
       <button class="nav-btn interactive-btn" onclick="toggleInteractive()">Interactive Mode</button>
     </div>
   </nav>
@@ -1177,54 +1218,66 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   <section class="skills-section" id="skills">
     <h2 class="section-title reveal">Battle <span>Skills</span></h2>
     <p class="section-subtitle reveal">Weapons in my arsenal</p>
+    <!-- Logos live in public/icons. Dark-ink logos come as a pair
+         (name.svg + name-dark.svg); CSS shows the one matching the theme. -->
     <div class="skills-grid">
       <div class="skill-card reveal">
-        <div class="skill-icon">&#128142;</div>
+        <div class="skill-icon"><img src="icons/flutter.svg" alt="Flutter" loading="lazy" onerror="iconFallback(this)"></div>
+        <div class="skill-area area-mobile">Mobile</div>
         <div class="skill-name">Flutter / Dart</div>
         <div class="skill-detail">Cross-platform mobile</div>
       </div>
       <div class="skill-card reveal">
-        <div class="skill-icon">&#9889;</div>
+        <div class="skill-icon"><img src="icons/expo-dark.svg" alt="Expo" class="on-dark" loading="lazy" onerror="iconFallback(this)"><img src="icons/expo.svg" alt="Expo" class="on-light" loading="lazy" onerror="iconFallback(this)"></div>
+        <div class="skill-area area-mobile">Mobile</div>
         <div class="skill-name">React Native</div>
         <div class="skill-detail">Expo &amp; EAS Build</div>
       </div>
       <div class="skill-card reveal">
-        <div class="skill-icon">&#9883;</div>
+        <div class="skill-icon"><img src="icons/react.svg" alt="React" loading="lazy" onerror="iconFallback(this)"><img src="icons/nextjs-dark.svg" alt="Next.js" class="on-dark" loading="lazy" onerror="iconFallback(this)"><img src="icons/nextjs.svg" alt="Next.js" class="on-light" loading="lazy" onerror="iconFallback(this)"></div>
+        <div class="skill-area area-web">Web &amp; APIs</div>
         <div class="skill-name">Next.js / React</div>
         <div class="skill-detail">Web dashboards</div>
       </div>
       <div class="skill-card reveal">
-        <div class="skill-icon">&#9881;</div>
+        <div class="skill-icon"><img src="icons/nodejs-dark.svg" alt="Node.js" class="on-dark wide" loading="lazy" onerror="iconFallback(this)"><img src="icons/nodejs.svg" alt="Node.js" class="on-light wide" loading="lazy" onerror="iconFallback(this)"><img src="icons/express-dark.svg" alt="Express" class="on-dark" loading="lazy" onerror="iconFallback(this)"><img src="icons/express.svg" alt="Express" class="on-light" loading="lazy" onerror="iconFallback(this)"></div>
+        <div class="skill-area area-web">Web &amp; APIs</div>
         <div class="skill-name">Node.js / Express</div>
         <div class="skill-detail">REST APIs</div>
       </div>
       <div class="skill-card reveal">
-        <div class="skill-icon">&#128099;</div>
+        <div class="skill-icon"><img src="icons/go.png" alt="Go" class="wide" loading="lazy" onerror="iconFallback(this)"></div>
+        <div class="skill-area area-web">Web &amp; APIs</div>
         <div class="skill-name">Go</div>
         <div class="skill-detail">Fast single-binary services</div>
       </div>
       <div class="skill-card reveal">
-        <div class="skill-icon">&#128013;</div>
+        <div class="skill-icon"><img src="icons/python.svg" alt="Python" loading="lazy" onerror="iconFallback(this)"><img src="icons/django-dark.svg" alt="Django" class="on-dark" loading="lazy" onerror="iconFallback(this)"><img src="icons/django.svg" alt="Django" class="on-light" loading="lazy" onerror="iconFallback(this)"></div>
+        <div class="skill-area area-web">Web &amp; APIs</div>
         <div class="skill-name">Python / Django</div>
         <div class="skill-detail">Automation &amp; tooling</div>
       </div>
       <div class="skill-card reveal">
-        <div class="skill-icon">&#128190;</div>
+        <div class="skill-icon"><img src="icons/sql.svg" alt="SQL" class="wide" loading="lazy" onerror="iconFallback(this)"></div>
+        <div class="skill-area area-data">Data</div>
         <div class="skill-name">SQL Server / Oracle</div>
         <div class="skill-detail">Enterprise databases</div>
       </div>
       <div class="skill-card reveal">
-        <div class="skill-icon">&#128293;</div>
+        <div class="skill-icon"><img src="icons/firebase.svg" alt="Firebase" loading="lazy" onerror="iconFallback(this)"></div>
+        <div class="skill-area area-data">Data</div>
         <div class="skill-name">Firebase</div>
         <div class="skill-detail">Auth, Realtime DB, Storage</div>
       </div>
       <div class="skill-card reveal">
-        <div class="skill-icon">&#129504;</div>
+        <div class="skill-icon"><img src="icons/ollama-dark.svg" alt="Ollama" class="on-dark" loading="lazy" onerror="iconFallback(this)"><img src="icons/ollama.svg" alt="Ollama" class="on-light" loading="lazy" onerror="iconFallback(this)"></div>
+        <div class="skill-area area-ai">AI &amp; Infra</div>
         <div class="skill-name">Local LLMs &amp; OCR</div>
         <div class="skill-detail">Ollama, Tesseract</div>
       </div>
       <div class="skill-card reveal">
-        <div class="skill-icon">&#127760;</div>
+        <div class="skill-icon"><img src="icons/cisco.svg" alt="Cisco" class="wide" loading="lazy" onerror="iconFallback(this)"></div>
+        <div class="skill-area area-ai">AI &amp; Infra</div>
         <div class="skill-name">Networking</div>
         <div class="skill-detail">CCNA / CCNP Certified</div>
       </div>
@@ -1236,12 +1289,12 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     <h2 class="section-title reveal">Get in <span>Touch</span></h2>
     <p class="section-subtitle reveal">Let's build something together</p>
     <div class="contact-links reveal">
-      <a href="mailto:samerjameel00@gmail.com" class="contact-link">&#9993; Email</a>
-      <a href="https://linkedin.com/in/samerjameel" target="_blank" class="contact-link">&#128188; LinkedIn</a>
-      <a href="https://github.com/theronindev" target="_blank" class="contact-link">&#128025; GitHub</a>
-      <a href="https://wa.me/9647812824046" target="_blank" class="contact-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:middle;margin-right:4px"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg> WhatsApp</a>
-      <a href="https://t.me/samerjameel" target="_blank" class="contact-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:middle;margin-right:4px"><path d="M11.944 0A12 12 0 000 12a12 12 0 0012 12 12 12 0 0012-12A12 12 0 0012 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 01.171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.479.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg> Telegram</a>
-      <a href="https://docs.google.com/document/d/e/2PACX-1vRDblN0onn5fer95iVLDvMb6nzudNSBkrY72_X5TLUqjOtk4aTb9i5Pc8t2-a9r4g/pub" target="_blank" class="contact-link">&#128196; Resume</a>
+      <a href="mailto:samerjameel00@gmail.com" class="contact-link"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm0 4-8 5-8-5V6l8 5 8-5z"/></svg>Email</a>
+      <a href="https://linkedin.com/in/samerjameel" target="_blank" rel="noopener" class="contact-link"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zM8.3 10H5.7v8h2.6zM7 5.8a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM18.3 13.4c0-2.4-1.3-3.6-3.1-3.6-1.4 0-2.1.8-2.4 1.3V10h-2.6v8h2.6v-4.4c0-1.2.5-1.9 1.4-1.9s1.4.7 1.4 1.9V18h2.7z"/></svg>LinkedIn</a>
+      <a href="https://github.com/theronindev" target="_blank" rel="noopener" class="contact-link"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-3.2 19.5c.5.1.7-.2.7-.5v-1.7c-2.8.6-3.4-1.3-3.4-1.3-.5-1.2-1.1-1.5-1.1-1.5-.9-.6.1-.6.1-.6 1 .1 1.5 1 1.5 1 .9 1.6 2.4 1.1 3 .9.1-.7.4-1.1.6-1.4-2.2-.3-4.6-1.1-4.6-5 0-1.1.4-2 1-2.7-.1-.2-.4-1.3.1-2.7 0 0 .8-.3 2.8 1a9.6 9.6 0 0 1 5 0c1.9-1.3 2.8-1 2.8-1 .5 1.4.2 2.5.1 2.7.6.7 1 1.6 1 2.7 0 3.9-2.3 4.7-4.6 5 .4.3.7.9.7 1.9V21c0 .3.2.6.7.5A10 10 0 0 0 12 2z"/></svg>GitHub</a>
+      <a href="https://wa.me/9647812824046" target="_blank" rel="noopener" class="contact-link"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15L2 22l5.2-1.4A10 10 0 1 0 12 2zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.3-.5 0-1 .2-3.3-.7-2.8-1.1-4.5-3.9-4.7-4.1-.1-.2-1.1-1.5-1.1-2.8s.7-2 1-2.3c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.3 0 .5l-.3.5-.4.4c-.1.1-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.4 2.4 1.5.3.2.5.1.6 0l.9-1c.2-.3.4-.2.6-.1l1.9.9c.3.1.5.2.5.3.1.1.1.7-.1 1.3z"/></svg>WhatsApp</a>
+      <a href="https://t.me/samerjameel" target="_blank" rel="noopener" class="contact-link"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21.9 4.3 18.7 19.4c-.2 1-.9 1.3-1.7.8l-4.8-3.5-2.3 2.2c-.3.3-.5.5-1 .5l.3-4.9 8.9-8c.4-.3-.1-.5-.6-.2L6.5 13.2l-4.7-1.5c-1-.3-1-1 .2-1.5L20.5 3c.9-.3 1.6.2 1.4 1.3z"/></svg>Telegram</a>
+      <a href="https://docs.google.com/document/d/e/2PACX-1vRDblN0onn5fer95iVLDvMb6nzudNSBkrY72_X5TLUqjOtk4aTb9i5Pc8t2-a9r4g/pub" target="_blank" rel="noopener" class="contact-link"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zm-1 7V3.5L18.5 9zM8 13h8v2H8zm0 4h8v2H8zm0-8h3v2H8z"/></svg>Resume</a>
     </div>
   </section>
 
@@ -1448,6 +1501,11 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         img.setAttribute('href', ICON_FALLBACK + img.dataset.icon));
       probe.src = 'icons/' + nodeIcons[0].dataset.icon;
     })();
+
+    /* Interactive Mode (interactive.html, same origin, in an iframe) reads
+       this so its panels always match the roadmap. Top-level const is not a
+       window property, hence the explicit export. */
+    window.PORTFOLIO_DATA = { milestones: MILESTONES };
 
     const cardsContainer = document.getElementById('cards-container');
 
@@ -1670,12 +1728,32 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         frame.src = '';
         document.body.style.overflow = '';
       } else {
+        // Keys go to whichever document has focus. Without this the game
+        // ignores the keyboard until the visitor clicks inside the iframe.
+        frame.onload = () => { try { frame.contentWindow.focus(); } catch (e) {} };
         frame.src = 'interactive.html';
         overlay.classList.add('active');
         closeBtn.classList.add('active');
         document.body.style.overflow = 'hidden';
+        frame.focus();
       }
     }
+
+    // The game asks to close itself (pause menu "Back to the portfolio",
+    // finale, or Esc on the title card).
+    window.addEventListener('message', e => {
+      if (e.origin !== location.origin || !e.data) return;
+      const overlayOpen = document.getElementById('interactiveOverlay').classList.contains('active');
+      if (e.data.type === 'ronin:exit' && overlayOpen) toggleInteractive();
+      // While a game panel is open, its own × takes the top-right corner.
+      if (e.data.type === 'ronin:panel') {
+        document.getElementById('closeInteractive').classList.toggle('active', overlayOpen && !e.data.open);
+      }
+    });
+    // Esc while focus is still on the parent page (e.g. on the Close button).
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && document.getElementById('interactiveOverlay').classList.contains('active')) toggleInteractive();
+    });
   </script>
 
 

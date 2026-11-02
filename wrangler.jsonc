@@ -1,0 +1,10 @@
+// Cloudflare Workers config: serve the Vite build (dist/) as a static site.
+// The Cloudflare build runs `npm run build`, then `npx wrangler deploy`, which reads this file.
+// Without it, Wrangler tries to auto-configure the project and refuses Vite < 6.
+{
+  "name": "portfolio",
+  "compatibility_date": "2026-10-01",
+  "assets": {
+    "directory": "./dist"
+  }
+}

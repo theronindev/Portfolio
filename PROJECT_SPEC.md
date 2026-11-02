@@ -9,14 +9,18 @@ covering career history and projects, plus a hidden ronin side-scroller mode.
 ## Domains
 - **theronindev.com**
 - **theronindev.dev**
-- Currently registered via Namecheap. Planned move of DNS and registration to
-  Cloudflare within roughly five months of October 2026.
+- `.com` is registered at, and uses DNS from, **Cloudflare** (transferred 2026-11-02).
+  `.com` is the primary domain.
+- `.dev` is still registered at Namecheap, with DNS on Namecheap hosting. Plan: move its
+  DNS to Cloudflare and 301 it to `.com`.
 
 ## Hosting
-- **Cloudflare Pages** (free plan), building from GitHub on every push to `main`
+- **Cloudflare Worker `portfolio`** (free plan, static assets), building from GitHub
+  on every push to `main`: `npm run build`, then `npx wrangler deploy`.
+- `wrangler.jsonc` serves `dist/`. Without it, Wrangler's auto-setup fails on Vite 5.
 - Repo: `github.com/theronindev/Portfolio`
-- Live at `theronindev.pages.dev` until the custom domain is attached
-- Build command `npm run build`, output directory `dist`, `NODE_VERSION=20`
+- Legacy: Namecheap **Stellar** shared hosting still serves an old manual upload on
+  `.dev` until the switch. The plan ends 2027-02-27.
 - See `DEPLOY.md` for the full walkthrough
 
 ## Tech Stack
@@ -120,7 +124,7 @@ portfolio/
 ├── interactive.html      # Hidden side-scroller (iframed by index.html)
 ├── vite.config.js        # Vite config — TWO entry points, port 3000, esbuild
 ├── package.json
-├── DEPLOY.md             # GitHub + Cloudflare Pages walkthrough
+├── DEPLOY.md             # GitHub + Cloudflare Workers walkthrough
 ├── PROJECT_SPEC.md       # This file
 ├── public/
 │   ├── _headers          # Cloudflare caching + security headers
@@ -174,36 +178,62 @@ Firebase, go_router, Material 3**, with a shimmer bar and pulsing green dot.
 Flutter/Dart · React Native · Next.js/React · Node.js/Express · Go ·
 Python/Django · SQL Server/Oracle · Firebase · Local LLMs & OCR · Networking (CCNA)
 
+Each card shows its real logo from `public/icons/` (lower-case names:
+`flutter.svg`, `expo.svg` for React Native, `react.svg` + `nextjs.svg`,
+`nodejs.svg`, `go.png`, `python.svg`, `sql.svg`, `firebase.svg`, `ollama.svg`,
+`cisco.svg`). React, Next.js, Ollama and Cisco come from Simple Icons (CC0).
+Dark-ink logos ship as a pair, `name.svg` for light mode and `name-dark.svg`
+for dark mode (Expo, Next.js, Node.js, Ollama), and CSS shows the one that
+matches `data-theme` (also Django and Express, shown beside Python and Node).
+Cards are a 5×2 grid (2×5 under 760px), ordered by area with a small tag:
+Mobile · Web & APIs · Data · AI & Infra. Off disk, `iconFallback()` in `<head>` retries
+`src/assets/icons/`. `go-original.png` is the uncropped source of `go.png`.
+
 ### Get in Touch
 Email, LinkedIn, GitHub, WhatsApp, Telegram, Resume — pill buttons with SVG icons
 
-### Interactive Mode (Hidden)
-Fullscreen overlay iframing `interactive.html`. CSS ronin character, parallax
-Japanese world, Arrow/WASD + Space controls, four buildings (torii, dojo, temple,
-zen garden) with slide-in info panels.
+### Interactive Mode (Hidden) — "Path of the Ronin"
+Fullscreen overlay iframing `interactive.html`, a canvas side-scroller with a DOM
+HUD, panels and menus on top.
+
+- **World:** 7700 units long; night sky with moon, clouds and stars, three
+  parallax ridges plus a snow peak, a tree line, a stone path, sakura, bamboo,
+  stone lanterns that light as you pass, fireflies, and petals.
+- **Landmarks (5):** Torii → About, Pagoda → Journey (career), Dojo → Skills,
+  Temple → Projects, Zen Garden → Contact. Each is also a checkpoint.
+- **Mechanics:** run, variable-height jump with coyote time, dash (i-frames),
+  and katana slash. Seven one-way platforms, ten skill orbs carrying the real
+  logos, and twelve named "bugs" (crawlers, flyers, and a 5-HP "Legacy
+  Monolith" boss). Three hearts; at zero you respawn at the last landmark.
+  Collecting everything shows a finale with stats and a contact CTA.
+- **Controls:** ←/→ or A/D, ↑/W jump, Space/J slash, Shift/K dash, E/Enter
+  open, Esc closes the panel or pauses. Touch devices get on-screen buttons and
+  a contextual Open button, and portrait phones get a dedicated layout.
+  Clicking a marker in the top journey bar fast-travels to that landmark.
+- **Content:** panels read `window.parent.PORTFOLIO_DATA.milestones`, which
+  `index.html` exposes, so they always match the roadmap. Opened standalone,
+  they fall back to the `SNAPSHOT` array inside `interactive.html`. Refresh
+  that snapshot when milestones change. Skills, About text, the WIP card and
+  contacts are separate constants near the top of the script.
+- **Parent link:** `index.html` focuses the iframe on load (otherwise keys are
+  ignored until a click) and closes the overlay on a `ronin:exit` postMessage.
+- `window.gameState` (with `.player`) is exposed for DevTools debugging.
 
 ## Analytics
 
-Two Google tags are loaded from the top of `<head>`, with the GTM `<noscript>`
-iframe just before `</body>`:
+Only **Google Tag Manager** (`GTM-PGCQJPM5`) is in the page: its script sits right
+after the charset/viewport metas in `<head>`, and its `<noscript>` iframe just
+before `</body>`. GA4 (`G-6C3W8552N0`) is loaded **by the GTM container** (a
+Google Tag on *Initialization – All Pages*), plus a `contact_click` GA4 event on
+contact-link clicks.
 
-| Tag | ID |
-|---|---|
-| Google Tag Manager | `GTM-PGCQJPM5` |
-| Google Analytics 4 via gtag.js | `G-6C3W8552N0` |
+> **Do not re-add a gtag.js snippet.** With GA4 already in the container, a direct
+> gtag.js block counts every visit twice. Add new tracking in GTM instead.
 
-> **Check for double-counted pageviews.** Running a GTM container *and* a direct
-> gtag.js snippet is fine only if the container does not also fire a GA4
-> configuration tag for `G-6C3W8552N0`. If it does, every visit is counted twice.
-> Confirm in GTM Preview, or watch the GA4 Realtime report during a single visit.
-> If the container does hold that tag, drop the gtag.js block from `<head>` and
-> let GTM own GA4.
+> **Keep `<meta charset="UTF-8">` first in `<head>`.** It must sit within the first
+> 1024 bytes, or the page silently loses its Japanese text and em-dashes.
 
-> **Keep `<meta charset="UTF-8">` within the first 1024 bytes of the file.** The
-> tracking snippets sit above it, leaving about 240 bytes of headroom. Adding
-> another snippet there would push the charset declaration past the limit, and the
-> page would silently lose its Japanese text and em-dashes. Safest fix is to move
-> the charset and viewport meta tags back above the tracking block.
+`interactive.html` has no tags of its own; it runs inside the main page's iframe.
 
 ## Ambient Effects
 - **Cherry blossoms:** pink petals falling continuously
@@ -259,7 +289,7 @@ iframe just before `</body>`:
 ## Icon paths: why they break when you open the file directly
 
 Icons live in `public/icons/` and are served at `/icons/*`. That path is correct
-over http, which covers `npm run dev`, `npm run preview`, and Cloudflare Pages.
+over http, which covers `npm run dev`, `npm run preview`, and the live Cloudflare site.
 It does **not** resolve when `index.html` is opened straight off disk, because
 `public/` is not part of the served path, so no `icons/` folder exists at the
 project root.
@@ -308,10 +338,14 @@ originals and the off-disk fallback. The preferred workflow is still
       cards, working scroll reveal, counters, theme toggle, and hover isolation
 
 ## What's Pending
-- [ ] Create the Cloudflare Pages project and connect the GitHub repo (`DEPLOY.md` Phase 1)
-- [ ] Move DNS from Namecheap to Cloudflare, then attach theronindev.com (Phase 2)
-- [ ] **Resize the oversized icons.** 6.5 MB of a 6.5 MB build is icons displayed
-      at 48-52px. `cosmetica.png` alone is 2.2 MB. See the DEPLOY.md section.
+- [x] Cloudflare Worker connected to the GitHub repo; `wrangler.jsonc` added for the build
+- [x] theronindev.com transferred to Cloudflare (registrar + DNS)
+- [ ] Attach theronindev.com to the Worker, removing the redirect to `.dev` (`DEPLOY.md` Phase 2)
+- [ ] Move `.dev` DNS to Cloudflare and 301 it to `.com` (Phase 3)
+- [ ] Let the Namecheap Stellar hosting lapse (ends 2027-02-27)
+- [x] Resized oversized images: icons capped at 256px, `roninicon.png` 256px,
+      `me.jpg` 480px; build went from ~6.5 MB to ~0.6 MB. Keep new images under
+      256px (480px for photos).
 - [ ] Confirm the real dates for the four 2026 projects
 - [ ] Optional: real app icons for Hub, MSR, CV Screener, and SFA (emoji for now)
 
